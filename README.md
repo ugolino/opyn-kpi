@@ -7,6 +7,11 @@ Install dependencies:
 $ npm i
 ```
 
+Add Infura https Endpoint
+```
+INFURA_ENDPOINT = https://mainnet.infura.io/v3/XXXXXXXXXXXXXXXXXXXXX
+```
+
 ### To get total insurance coverage in dollar
 
 ```
