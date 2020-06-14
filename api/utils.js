@@ -1,11 +1,12 @@
 // Import modules
 const Web3 = require('web3');
 
-require('dotenv').config()
+// require('dotenv').config()
+
+console.log(process.env.VUE_APP_API_KEY)
 
 // connect to Infura
-// const rpcUrl = process.env.INFURA_ENDPOINT || '';
-const rpcUrl = 'https://mainnet.infura.io/v3/750947ab31924df089f69ec5619428e4'
+const rpcUrl = process.env.VUE_APP_INFURA_ENDPOINT || '';
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcUrl));
 
 // init contract object
