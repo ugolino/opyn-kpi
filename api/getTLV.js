@@ -31,7 +31,7 @@ exports.getEthLocked = async(otokens) => {
     console.log("Total ETH locked: ", totalEthLocked, "ETH");
 
     tokensLockedArray.push({
-        name: "Total",
+        name: "TotalETH",
         value: totalEthLocked,
         currency: "ETH"
     })
@@ -83,7 +83,7 @@ exports.getTokenLocked = async (t, otokens) => {
     console.log("Total", symbol, "locked: ", totalAmountLocked);
 
     tokensLockedArray.push({
-        name: 'Total',
+        name: `Total${symbol}`,
         value: totalAmountLocked,
         currency: symbol
     })
@@ -104,7 +104,7 @@ exports.getTotalDollarLocked = async (oTokensAddresses) => {
     console.log("Total ETH locked in USD:", totalEthLockedDollar);
 
     tokensLockedArray.push({
-        name: "Total",
+        name: "TotalETH",
         value: totalEthLockedDollar,
         currency: "USD"
     })

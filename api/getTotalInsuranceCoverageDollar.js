@@ -35,7 +35,8 @@ getCompoundInsuranceDollar = async (octoken, name, decimals, octokenExchangeAdd,
 
     coverageInsuranceArray.push({
         name: name,
-        value: insuranceBoughtDollar
+        value: insuranceBoughtDollar,
+        currency: "USD"
     })
 
     return insuranceBoughtDollar;    
@@ -56,7 +57,8 @@ getOcrvInsuranceDollar = async (ocrv, name, decimals, oCrvExchangeAdd, add1, add
 
     coverageInsuranceArray.push({
         name: name,
-        value: insuranceBoughtDollar
+        value: insuranceBoughtDollar,
+        currency: "USD"
     })
 
     return insuranceBoughtDollar
@@ -75,7 +77,8 @@ getOethPutInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, 
 
     coverageInsuranceArray.push({
         name: name,
-        value: insuranceBoughtDollar
+        value: insuranceBoughtDollar,
+        currency: "USD"
     })
 
     return insuranceBoughtDollar;
@@ -96,7 +99,8 @@ getOethCallInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1,
 
     coverageInsuranceArray.push({
         name: name,
-        value: insuranceBoughtDollar
+        value: insuranceBoughtDollar,
+        currency: "USD"
     })
 
     return insuranceBoughtDollar;
@@ -219,7 +223,8 @@ exports.run = async (otokens) => {
 
     coverageInsuranceArray.push({
         name: 'Total',
-        value: calculateInsuranceInDollar(oTokensInsuranceBoughtDollar)
+        value: calculateInsuranceInDollar(oTokensInsuranceBoughtDollar),
+        currency: "USD"
     })
 
     return coverageInsuranceArray
