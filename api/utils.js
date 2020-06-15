@@ -3,7 +3,6 @@ const Web3 = require('web3');
 
 // require('dotenv').config()
 
-console.log(process.env.VUE_APP_API_KEY)
 
 // connect to Infura
 const rpcUrl = process.env.VUE_APP_INFURA_ENDPOINT || '';

@@ -8,10 +8,11 @@ const getTotalInsuranceCoverageDollar = require('./getTotalInsuranceCoverageDoll
 const getInteractedAddresses = require('./getInteractedAddresses');
 const getTLV = require('./getTLV');
 const getPastTVL = require('./getPastTVL');
+const getAllPastTVL = require('./getAllPastTVL');
 const get0x = require('./get0xData');
 
 
-async function getKpi(kpiType, startDate, endDate) {
+async function getKpi(kpiType, date) {
 
     // opyn tokens array
     let oTokens = [];
@@ -58,9 +59,9 @@ async function getKpi(kpiType, startDate, endDate) {
         case 'interacted-addresses':
             return getInteractedAddresses.run(oTokens.concat(oethTokens));
         case 'history':
-            console.log('history', startDate)
-            console.log('history', endDate)
-            return getPastTVL.run(startDate, endDate);
+            return getPastTVL.run(date);
+        case 'history-all':
+            return getAllPastTVL.run();
         case '0x-data':
             return get0x.run([
                 argv.t
