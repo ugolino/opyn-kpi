@@ -14,7 +14,7 @@
     </header>
     <div class="card-content">
       <div class="content">
-        <div v-if="onlyTotals.length > 0" class="columns">
+        <div v-if="onlyTotals && onlyTotals.length > 0" class="columns">
           <div v-for="(item, index) in onlyTotals" :key="index" class="column">
             <h2 class="is-size-2">
               {{ new Intl.NumberFormat('en-EN').format(item.value.toFixed(0))  }} 
@@ -24,7 +24,7 @@
         </div>
 
 
-          <div v-if="currencies.length > 1" class="buttons my-4">
+          <div v-if="currencies && currencies.length > 1" class="buttons my-4">
             <b-button type="is-primary"
               v-for="(currency, index) in currencies" 
               :key="index"
@@ -36,7 +36,7 @@
           </div>
 
 
-        <div v-if="filterSubTotalsByCurrencies.length > 0" class="columns">
+        <div v-if="filterSubTotalsByCurrencies && filterSubTotalsByCurrencies.length > 0" class="columns">
           <div v-for="(item, index) in filterSubTotalsByCurrencies" :key="index" class="column">
             <h2 class="is-size-4">
               {{ new Intl.NumberFormat('en-EN').format(item.value.toFixed(0))  }} 
@@ -47,6 +47,7 @@
         </div>
 
         <b-table
+          v-if="withoutTotalsByCurrency && withoutTotalsByCurrency.length > 0"
           :data=" showMore ? withoutTotalsByCurrency.slice(0, withoutTotalsByCurrency.length) : withoutTotalsByCurrency.slice(0, 5) "
           >
           <template slot-scope="props">
@@ -108,44 +109,43 @@ export default {
   },
   computed: {
     onlyTotals(){
-      if (this.dataArray.length > 0) {
+      if (this.dataArray && this.dataArray.length > 0) {
         return this.dataArray.filter( item => item.name.toLowerCase() === "total" )
       }
       
     },
     subTotals(){
-      if (this.dataArray.length > 0) {
+      if (this.dataArray && this.dataArray.length > 0) {
         return this.dataArray.filter( item => item.name.toLowerCase() != "total" && item.name.toLowerCase().includes("total") ) 
       }
     },
     filterSubTotalsByCurrencies(){
-      if (this.selectedCurrency) {
-        return this.subTotals.filter( item => item.name.toLowerCase().includes(this.selectedCurrency.toLowerCase()) )
+      if (this.subTotals) {
+        if (this.selectedCurrency) {
+          return this.subTotals.filter( item => item.name.toLowerCase().includes(this.selectedCurrency.toLowerCase()) )
+        }
+        else {
+          return this.subTotals.filter( item => item.name.toLowerCase() )
+        } 
       }
-      else {
-        return this.subTotals.filter( item => item.name.toLowerCase() )
-      } 
     },
     withoutTotals(){
-      if (this.dataArray.length > 0) {
+      if (this.dataArray && this.dataArray.length > 0) {
         return this.dataArray.filter( item => !item.name.toLowerCase().includes("total") )
       }
     },
     withoutTotalsByCurrency(){
-      if (this.dataArray.length > 0) {
+      if (this.dataArray && this.dataArray.length > 0) {
         return this.withoutTotals.filter( item => item.currency === this.selectedCurrency).sort((a, b) => (a.value < b.value) ? 1 : -1)
       }
     },
-  },
-  mounted(){
-    this.getCurrencies()
-  },
-  methods: {
     getCurrencies(){
-      this.currencies = [...new Set(this.withoutTotals.map(item => item.currency))]
-      this.selectedCurrency = this.currencies[0]
+      if (this.withoutTotals && this.withoutTotals.length > 0) {
+        this.currencies = [...new Set(this.withoutTotals.map(item => item.currency))]
+        this.selectedCurrency = this.currencies[0]
+      }
     }
-  }
+  },
   
 }
 </script>
