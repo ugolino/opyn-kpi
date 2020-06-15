@@ -32,10 +32,10 @@
 
 
       <div class="column is-half">
-        <card :dataArray="insuranceCoverage" title="Insurance Coverage" :lastUpdate="insuranceCoverageLastUpdate" :isLoading="loadingInsuranceCoverageData" />
+        <card v-if="insuranceCoverage.length > 0" :dataArray="insuranceCoverage" title="Insurance Coverage" :lastUpdate="insuranceCoverageLastUpdate" :isLoading="loadingInsuranceCoverageData" />
       </div>
       <div class="column is-half">
-        <card :dataArray="usdLocked" title="USD Locked" :lastUpdate="usdLockedLastUpdate" :isLoading="loadingUsdLockedData" />
+        <card v-if="usdLocked.length > 0" :dataArray="usdLocked" title="USD Locked" :lastUpdate="usdLockedLastUpdate" :isLoading="loadingUsdLockedData" />
       </div>
 
   </div>
