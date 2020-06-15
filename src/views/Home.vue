@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <p v-if="chartDataLastUpdate">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }}</p>
+        <p v-if="chartDataLastUpdate" class="is-small has-text-right">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }} (DefiPulse)</p>
 
         <column-chart :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
       </div>

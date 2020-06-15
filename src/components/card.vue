@@ -5,7 +5,6 @@
         {{ title }}
         
       </p>
-      <p class="has-text-right my-4">last updated: {{ lastUpdate - Date.now() | duration('humanize', true) }}</p>
       <radar-spinner
           v-if="isLoading"
           :size="40"
@@ -14,6 +13,7 @@
     </header>
     <div class="card-content">
       <div class="content">
+        <p class="has-text-right is-small has-text-right">last updated: {{ lastUpdate - Date.now() | duration('humanize', true) }} (Infura)</p>
         <div v-if="onlyTotals.length > 0" class="columns">
           <div v-for="(item, index) in onlyTotals" :key="index" class="column">
             <h2 class="is-size-2">
