@@ -27,15 +27,31 @@
 
         <p v-if="chartDataLastUpdate" class="is-small has-text-right">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }} (DefiPulse)</p>
 
-        <column-chart :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+        <column-chart v-if="chartDataByType" :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+
+        <radar-spinner
+          v-else
+          :size="80"
+          class="my-4 mb-4"
+        />
       </div>
 
 
       <div class="column is-half">
         <card v-if="insuranceCoverage.length > 0" :dataArray="insuranceCoverage" title="Insurance Coverage" :lastUpdate="insuranceCoverageLastUpdate" :isLoading="loadingInsuranceCoverageData" />
+        <radar-spinner
+          v-else
+          :size="80"
+          class="my-4 mb-4"
+        />
       </div>
       <div class="column is-half">
         <card v-if="usdLocked.length > 0" :dataArray="usdLocked" title="USD Locked" :lastUpdate="usdLockedLastUpdate" :isLoading="loadingUsdLockedData" />
+        <radar-spinner
+          v-else
+          :size="80"
+          class="my-4 mb-4"
+        />
       </div>
 
   </div>
@@ -45,10 +61,12 @@
 import { mapState, mapActions } from 'vuex'
 import api from '../../api'
 import card from '../components/card'
+import {RadarSpinner} from 'epic-spinners'
 
 export default {
   components: {
-    card
+    card,
+    RadarSpinner
   },
   data() {
     return {

@@ -3,7 +3,6 @@
     <header class="card-header">
       <p class="card-header-title">
         {{ title }}
-        
       </p>
       <radar-spinner
           v-if="isLoading"
