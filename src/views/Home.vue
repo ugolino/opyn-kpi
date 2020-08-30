@@ -27,7 +27,7 @@
 
         <p v-if="chartDataLastUpdate" class="is-small has-text-right">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }} (DefiPulse)</p>
 
-        <column-chart v-if="chartDataByType" :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+        <column-chart v-if="chartDataByType.length > 0" :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
 
         <radar-spinner
           v-else

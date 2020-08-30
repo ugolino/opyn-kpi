@@ -6,7 +6,7 @@
       </p>
       <radar-spinner
           v-if="isLoading"
-          :size="40"
+          :size="20"
           class="my-4 mb-4"
      />
     </header>
@@ -143,7 +143,7 @@ export default {
   methods: {
     getCurrencies(){
       this.currencies = [...new Set(this.withoutTotals.map(item => item.currency))]
-      this.selectedCurrency = this.currencies[0]
+      this.selectedCurrency = this.currencies[1]
     }
   }
   

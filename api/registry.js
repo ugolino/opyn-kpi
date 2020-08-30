@@ -16,6 +16,21 @@ module.exports = {
     daiAddress : "0x6b175474e89094c44da98b954eedeac495271d0f",
     usdcAddress : "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
 
+    wethAddress: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+    compAddress: '0xc00e94cb662c3520282e6f5717214004a7f26888',
+    balAddress: '0xba100000625a3754423978a60c9317c58a424e3d',
+    yfiAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+    crvAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
+
+    tokens: [
+        '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //wethAddress, 
+        '0xc00e94cb662c3520282e6f5717214004a7f26888', //compAddress, 
+        '0xba100000625a3754423978a60c9317c58a424e3d', //balAddress, 
+        '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //yfiAddress, 
+        '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //crvAddress 
+    ],
+
+
     // utils
     makerMedianizerAddress : "0x729D19f657BD0614b4985Cf1D82531c67569197B",
     optionsExchangeAddress : "0x5778f2824a114F6115dc74d432685d3336216017",

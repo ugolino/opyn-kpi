@@ -70,6 +70,8 @@ getOethPutInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, 
     let oEthBalance1 = await utils.getBalance(oEth, add1) / 10**decimals;
     let oEthBalance2 = await utils.getBalance(oEth, add2) / 10**decimals;
 
+    console.log(ethToUsd)
+
     let oEthBought = calculateInsuranceBought(oEthTotalSupply, oEthUniswapBalance, oEthBalance1, oEthBalance2);
     let insuranceBoughtDollar = (oEthBought * ethToUsd / 1e18);
 
@@ -90,11 +92,10 @@ getOethCallInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1,
     let oEthBalance1 = await utils.getBalance(oEth, add1) / 10**decimals;
     let oEthBalance2 = await utils.getBalance(oEth, add2) / 10**decimals;
 
-    let oethToEth = 1 / otokenStrikePrice.value * 1000;
+    let oethToEth = 1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000 );
 
     let oEthBought = calculateInsuranceBought(oEthTotalSupply, oEthUniswapBalance, oEthBalance1, oEthBalance2);
     let insuranceBoughtDollar = (oEthBought * ethToUsd / 1e18) / oethToEth;
-
     console.log(name, "insurance coverage bought in $: ", insuranceBoughtDollar);
 
     coverageInsuranceArray.push({
@@ -105,6 +106,44 @@ getOethCallInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1,
 
     return insuranceBoughtDollar;
 }
+
+getTokenPutInsuranceDollar = async (oToken, name, decimals, oTokenExchangeAdd, add1, add2, otokenUnderlyingAdd) => {
+    let oTokenTotalSupply = await utils.getTotalSupply(oToken) / 10 ** decimals;
+    let oTokenUniswapBalance = await utils.getBalance(oToken, oTokenExchangeAdd) / 10 ** decimals;
+    let oTokenBalance1 = await utils.getBalance(oToken, add1) / 10 ** decimals;
+    let oTokenBalance2 = await utils.getBalance(oToken, add2) / 10 ** decimals;
+
+    let tokenToUsd = await getTokenPriceCoingecko(otokenUnderlyingAdd)
+
+    console.log(`oTokenTotalSupply: ${oTokenTotalSupply}, 
+    oTokenUniswapBalance: ${oTokenUniswapBalance}, 
+    oTokenBalance1: ${oTokenBalance1}, 
+    oTokenBalance2: ${oTokenBalance2},  
+    tokenToUsd: ${tokenToUsd}`)
+
+    let oTokenBought = calculateInsuranceBought(oTokenTotalSupply, oTokenUniswapBalance, oTokenBalance1, oTokenBalance2);
+    let insuranceBoughtDollar = (oTokenBought * tokenToUsd);
+
+    console.log(name, "insurance token coverage bought in $: ", insuranceBoughtDollar);
+
+    coverageInsuranceArray.push({
+        name: name,
+        value: insuranceBoughtDollar,
+        currency: "USD"
+    })
+
+    return insuranceBoughtDollar;
+}
+
+
+getTokenPriceCoingecko = async (token) => {
+    const res = await fetch(
+        `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${token}&vs_currencies=usd`,
+    )
+    const price = (await res.json())[token.toLowerCase()].usd
+    return price
+}
+
 
 exports.run = async (otokens) => {
 
@@ -128,10 +167,14 @@ exports.run = async (otokens) => {
     // ETH/USD price
     const ethToUsd = await utils.getMakerEthUsd(makerMedianizerInstance);
 
+
+
     let oTokensInsuranceBoughtDollar = [];
 
     for(let i=0; i<otokens.length; i++) {
         let otokenName = await otokens[i].methods.name().call();    // oToken name
+
+        console.log(otokenName)
 
         // ignore oToken without name
         if(utils.toHex(otokenName) == 0x0) {
@@ -143,6 +186,7 @@ exports.run = async (otokens) => {
         let otokenStrikeAdd = await otokens[i].methods.strike().call();    // oToken strike token address
         let otokenStrikePrice = await otokens[i].methods.strikePrice().call();  // oToken strike price
         let otokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(otokens[i]._address).call(); // oToken uniswap exchange address
+
 
         if(otokenUnderlyingAdd == ADDRESS_ZERO) {
             oTokensInsuranceBoughtDollar.push(
@@ -158,7 +202,7 @@ exports.run = async (otokens) => {
             );
         }
 
-        if((otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)) {
+        else if((otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)) {
             oTokensInsuranceBoughtDollar.push(
                 await getOethCallInsuranceDollar(
                     otokens[i],
@@ -173,7 +217,7 @@ exports.run = async (otokens) => {
             );
         }
 
-        if(otokenUnderlyingAdd == registry.cDaiAddress) {
+        else if(otokenUnderlyingAdd == registry.cDaiAddress) {
             oTokensInsuranceBoughtDollar.push(
                 await getCompoundInsuranceDollar(
                     otokens[i],
@@ -187,7 +231,7 @@ exports.run = async (otokens) => {
             );
         }
 
-        if(otokenUnderlyingAdd == registry.cUsdcAddress) {
+        else if(otokenUnderlyingAdd == registry.cUsdcAddress) {
             oTokensInsuranceBoughtDollar.push(
                 await getCompoundInsuranceDollar(
                     otokens[i],
@@ -201,7 +245,7 @@ exports.run = async (otokens) => {
             );
         }
 
-        if(otokenUnderlyingAdd == registry.yDai) {
+        else if(otokenUnderlyingAdd == registry.yDai) {
             oTokensInsuranceBoughtDollar.push(
                 await getOcrvInsuranceDollar(
                     otokens[i],
@@ -213,6 +257,28 @@ exports.run = async (otokens) => {
                     yTokenToUsd
                 )
             );
+        }
+
+        
+
+        else if (registry.tokens.includes(otokenUnderlyingAdd.toLowerCase())) {
+             
+            console.log(`else: ${otokenName}`)
+
+            oTokensInsuranceBoughtDollar.push(
+                await getTokenPutInsuranceDollar(
+                    otokens[i],
+                    otokenName,
+                    otokenDecimals,
+                    otokenUniswapExchangeAdd,
+                    "0x9e68B67660c223B3E0634D851F5DF821E0E17D84",
+                    "0x076C95c6cd2eb823aCC6347FdF5B3dd9b83511E4",
+                    otokenUnderlyingAdd
+                )
+            );
+            
+
+           
         }
 
     }
