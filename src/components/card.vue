@@ -142,8 +142,8 @@ export default {
   },
   methods: {
     getCurrencies(){
-      this.currencies = [...new Set(this.withoutTotals.map(item => item.currency))]
-      this.selectedCurrency = this.currencies[1]
+      this.currencies = [...new Set(this.withoutTotals.map(item => item.currency))].reverse()
+      this.selectedCurrency = this.currencies[0]
     }
   }
   
