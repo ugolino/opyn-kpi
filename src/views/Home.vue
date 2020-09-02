@@ -26,7 +26,7 @@
         <div class="card-content">
           <div class="content">
             <b-table
-              :data=" showMoreOptions ? optionsList.slice(0, optionsList.length) : optionsList.slice(0, 10) "
+              :data=" showMoreOptions ? optionsList.slice(0, optionsList.length) : optionsList.slice(0, 7) "
               >
               <template slot-scope="props">
                 <b-table-column field="name" label="name" >
