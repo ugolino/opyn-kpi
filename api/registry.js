@@ -20,14 +20,14 @@ module.exports = {
     compAddress: '0xc00e94cb662c3520282e6f5717214004a7f26888',
     balAddress: '0xba100000625a3754423978a60c9317c58a424e3d',
     yfiAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
-    crvAddress: '0xD533a949740bb3306d119CC777fa900bA034cd52',
+    crvAddress: '0xd533a949740bb3306d119cc777fa900ba034cd52',
 
     tokens: [
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //wethAddress, 
         '0xc00e94cb662c3520282e6f5717214004a7f26888', //compAddress, 
         '0xba100000625a3754423978a60c9317c58a424e3d', //balAddress, 
         '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //yfiAddress, 
-        '0xD533a949740bb3306d119CC777fa900bA034cd52', //crvAddress 
+        '0xd533a949740bb3306d119cc777fa900ba034cd52', //crvAddress 
     ],
 
 
