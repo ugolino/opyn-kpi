@@ -70,12 +70,18 @@ getOethPutInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, 
     let oEthBalance1 = await utils.getBalance(oEth, add1) / 10**decimals;
     let oEthBalance2 = await utils.getBalance(oEth, add2) / 10**decimals;
 
-    console.log(ethToUsd)
+    console.log('oEthTotalSupply', oEthTotalSupply, 
+        'oEthUniswapBalance', oEthUniswapBalance, 
+        'oEthBalance1', oEthBalance1,
+        'oEthBalance2', oEthBalance2
+    )
 
     let oEthBought = calculateInsuranceBought(oEthTotalSupply, oEthUniswapBalance, oEthBalance1, oEthBalance2);
+
+    let cummOethBoughtDollar = (oEthTotalSupply * ethToUsd / 1e18);
     let insuranceBoughtDollar = (oEthBought * ethToUsd / 1e18);
 
-    console.log(name, "insurance coverage bought in $: ", insuranceBoughtDollar);
+    console.log(name, "insurance coverage bought in $: ", insuranceBoughtDollar, "cummulative insurance bought:", cummOethBoughtDollar );
 
     coverageInsuranceArray.push({
         name: name,

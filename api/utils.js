@@ -42,6 +42,12 @@ exports.toHex = (string) => {
     return web3.utils.toHex(string);
 }
 
+// get date from block
+exports.getDateFromBlock = async (blockNumber) => {
+    let block = await web3.eth.getBlock(blockNumber)
+    return block.timestamp
+}
+
 // Import ABIs
 exports.oTokenAbi = require('../ABI/oToken.json');
 exports.cDaiAbi = require('../ABI/cDai.json');
@@ -52,3 +58,4 @@ exports.OptionsExchangeAbi = require('../ABI/OptionsExchange.json');
 exports.OptionsFactoryAbi = require('../ABI/OptionsFactory.json');
 exports.OptionsContractAbi = require('../ABI/OptionsContract.json')
 exports.UniswapFactoryAbi = require('../ABI/UniswapFactory.json')
+exports.UniswapExchangeAbi = require('../ABI/UniswapExchange.json')
