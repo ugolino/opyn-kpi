@@ -235,17 +235,17 @@ export default {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
     this.loadingInsuranceCoverageData = true
-    // api.getKpi('insurance-coverage')
-    // .then( res => {
-    //   this.getInsuranceCoverageData(res)
-    //   this.loadingInsuranceCoverageData = false
-    // });
-    // this.loadingUsdLockedData = true
-    // api.getKpi('usd-locked')
-    // .then( res => {
-    //   this.getUsdLockedData(res)
-    //   this.loadingUsdLockedData = false
-    // });
+    api.getKpi('insurance-coverage')
+    .then( res => {
+      this.getInsuranceCoverageData(res)
+      this.loadingInsuranceCoverageData = false
+    });
+    this.loadingUsdLockedData = true
+    api.getKpi('usd-locked')
+    .then( res => {
+      this.getUsdLockedData(res)
+      this.loadingUsdLockedData = false
+    });
 
     this.loadingVolumesByDay = true
     api.getKpi('volumes-by-day')
