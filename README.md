@@ -1,6 +1,21 @@
 # Opyn KPI
 
-## How To Run
+Install dependencies:
+```
+$ yarn i
+```
+
+Start Server (default localhost:8080)
+```
+$ yarn serve
+```
+
+Add Infura https Endpoint
+```
+INFURA_ENDPOINT = https://mainnet.infura.io/v3/XXXXXXXXXXXXXXXXXXXXX
+```
+
+## How To Run Scripts
 
 Install dependencies:
 ```
