@@ -14,28 +14,29 @@ exports.run = async (tokens) => {
 
     const volumesArray = []
 
-    for (let j = tokens.length - 1; j >= 0; j--) {
-        let otokenName = await tokens[j].methods.name().call(); // oToken name
-        let otokenDecimals = await tokens[j].methods.decimals().call();    // oToken decimals
-        let otokenUnderlyingAdd = await tokens[j].methods.underlying().call();    // oToken underlying token address
-        let otokenStrikeAdd = await tokens[j].methods.strike().call();    // oToken strike token address
-        let otokenStrikePrice = await tokens[j].methods.strikePrice().call();  // oToken strike price
+    tokens.forEach(async (token) => {
+    // for (let j = tokens.length - 1; j >= 0; j--) {
+        let otokenName = await token.methods.name().call(); // oToken name
+        let otokenDecimals = await token.methods.decimals().call();    // oToken decimals
+        let otokenUnderlyingAdd = await token.methods.underlying().call();    // oToken underlying token address
+        let otokenStrikeAdd = await token.methods.strike().call();    // oToken strike token address
+        let otokenStrikePrice = await token.methods.strikePrice().call();  // oToken strike price
 
         tokensSold = []
         tokensBought = []
 
         // ignore oToken without name
         if (utils.toHex(otokenName) == 0x0) {
-            continue;
+            return;
         }
 
-        let tokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(tokens[j]._address).call(); // oToken uniswap exchange address
+        let tokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(token._address).call(); // oToken uniswap exchange address
         let uniswapExchange = await utils.initContract(utils.UniswapExchangeAbi, tokenUniswapExchangeAdd);  // uniswap exchange for the otoken
 
         if (otokenUnderlyingAdd == ADDRESS_ZERO || 
             registry.tokens.includes(otokenUnderlyingAdd.toLowerCase()) ||
             (otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)
-            ) {
+        ) {
             console.log(otokenName)
 
             let soldEvents = await uniswapExchange.getPastEvents('EthPurchase', {
@@ -71,7 +72,7 @@ exports.run = async (tokens) => {
 
             // console.log("tokensSold :", tokensSold, "tokensBought :", tokensBought)
 
-            groupSoldByDate = groupAndSum(tokensSold, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
+            groupSoldByDate = await groupAndSum(tokensSold, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
             
 
             let totalSoldByDate = await Promise.all(groupSoldByDate.map(async function (el) {
@@ -139,7 +140,7 @@ exports.run = async (tokens) => {
 
         }
 
-    }
+    })
 
     return volumesArray
 
