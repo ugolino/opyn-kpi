@@ -4,7 +4,7 @@ const registry = require('./registry');
 const fetch = require("node-fetch");
 const moment = require('moment');
 
-const ADDRESS_ZERO = 0x0000000000000000000000000000000000000000;
+const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 const historicalPrices = []
 
@@ -14,143 +14,153 @@ exports.run = async (tokens) => {
 
     const volumesArray = []
 
-    tokens.slice(Math.max(tokens.length - 3, 1)).forEach(async (token, i) => {
-    
+    const getData = async () => {
 
-        let otokenName = await token.methods.name().call(); // oToken name
-        let otokenDecimals = await token.methods.decimals().call();    // oToken decimals
-        let otokenUnderlyingAdd = await token.methods.underlying().call();    // oToken underlying token address
-        let otokenStrikeAdd = await token.methods.strike().call();    // oToken strike token address
-        let otokenStrikePrice = await token.methods.strikePrice().call();  // oToken strike price
-
-        let tokensSold = []
-        let tokensBought = []
-
-        // ignore oToken without name
-        if (utils.toHex(otokenName) == 0x0) {
-            return;
-        }
-
-        let tokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(token._address).call(); // oToken uniswap exchange address
-        let uniswapExchange = await utils.initContract(utils.UniswapExchangeAbi, tokenUniswapExchangeAdd);  // uniswap exchange for the otoken
-
-        if (otokenUnderlyingAdd == ADDRESS_ZERO || 
-            registry.tokens.includes(otokenUnderlyingAdd.toLowerCase()) ||
-            (otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)
-        ) {
-            let id = i+1
-            console.log(otokenName, id)
-
-            let soldEvents = await uniswapExchange.getPastEvents('EthPurchase', {
-                fromBlock: 0,
-                toBlock: 'latest'
-            });
-
-            for (let i = 0; i < soldEvents.length; i++) {
-                let timestamp = await utils.getDateFromBlock(soldEvents[i].blockNumber)
-
-                // let date = new Date(timestamp * 1000).toDateString()
-                
-                var date = moment.unix(timestamp).format("MM/DD/YY");
+        return Promise.all(
+            tokens.slice().map(async(token, i) => {
 
 
-                tokensSold.push({ date: date, tokensAmount: soldEvents[i].returnValues.tokens_sold })
-            }
+                let otokenName = await token.methods.name().call(); // oToken name
+                let otokenDecimals = await token.methods.decimals().call();    // oToken decimals
+                let otokenUnderlyingAdd = await token.methods.underlying().call();    // oToken underlying token address
+                let otokenStrikeAdd = await token.methods.strike().call();    // oToken strike token address
+                let otokenStrikePrice = await token.methods.strikePrice().call();  // oToken strike price
 
-            let boughtEvents = await uniswapExchange.getPastEvents('TokenPurchase', {
-                fromBlock: 0,
-                toBlock: 'latest'
-            });
+                let tokensSold = []
+                let tokensBought = []
 
-            for (let i = 0; i < boughtEvents.length; i++) {
-                let timestamp = await utils.getDateFromBlock(boughtEvents[i].blockNumber)
-
-                // let date = new Date(timestamp * 1000).toDateString()
-
-                var date = moment.unix(timestamp).format("MM/DD/YY");
-
-                tokensBought.push({ date: date, tokensAmount: boughtEvents[i].returnValues.tokens_bought })
-            }
-
-            // console.log("tokensSold :", tokensSold, "tokensBought :", tokensBought)
-
-            groupSoldByDate = groupAndSum(tokensSold, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
-            
-
-            let totalSoldByDate = await Promise.all(groupSoldByDate.map(async function (el) {
-                // check if call
-                let isCall = ((otokenStrikeAdd.toLowerCase() === ADDRESS_ZERO) && (otokenUnderlyingAdd.toLowerCase() === registry.usdcAddress)) ? true : false
-                // if call use multiplier
-                let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000)) : false
-                // if call token is eth
-                let token = isCall ? ADDRESS_ZERO : otokenUnderlyingAdd.toLowerCase()
-                console.log('isCall', isCall, token)
-                let assetPrice = await getTokenPrice(token, el.date)
-
-                let total = callMultiplier ? ((assetPrice * el.tokensAmount) / callMultiplier) : (assetPrice * el.tokensAmount)
-
-                let o = Object.assign({}, el);
-                o.assetPrice = assetPrice
-                o.total = total
-                return o;
-            }))
-
-            totCummulativeSold = 0
-            totalSoldByDate.forEach(el =>
-                el.cumulative = totCummulativeSold += el.total
-            )
-
-            console.log(otokenName, 'totalSoldByDate', totalSoldByDate)
-
-
-            groupBoughtByDate = groupAndSum(tokensBought, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
-
-
-            let totalBoughtByDate = await Promise.all(groupBoughtByDate.map(async function (el) {
-
-                let callMultiplier = false
-                let token = otokenUnderlyingAdd
-
-                if ((otokenStrikeAdd === ADDRESS_ZERO) && (otokenUnderlyingAdd === registry.usdcAddress)) {
-                    callMultiplier = (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000));
-                    token = ADDRESS_ZERO
+                // ignore oToken without name
+                if (utils.toHex(otokenName) == 0x0) {
+                    return;
                 }
 
-                let assetPrice = await getTokenPrice(token, el.date)
+                let tokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(token._address).call(); // oToken uniswap exchange address
+                let uniswapExchange = await utils.initContract(utils.UniswapExchangeAbi, tokenUniswapExchangeAdd);  // uniswap exchange for the otoken
 
-                let total = callMultiplier ? ((assetPrice * el.tokensAmount) / callMultiplier) : (assetPrice * el.tokensAmount)
+                if (otokenUnderlyingAdd == ADDRESS_ZERO ||
+                    registry.tokens.includes(otokenUnderlyingAdd.toLowerCase()) ||
+                    (otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)
+                ) {
+                    let id = i + 1
+                    console.log(otokenName, id)
 
-                let o = Object.assign({}, el);
-                o.assetPrice = assetPrice
-                o.total = total
-                return o;
-            }))
+                    let soldEvents = await uniswapExchange.getPastEvents('EthPurchase', {
+                        fromBlock: 0,
+                        toBlock: 'latest'
+                    });
 
-            totCummulativeBought = 0
-            totalBoughtByDate.forEach(el =>
-                el.cumulative = totCummulativeBought += el.total
-            )
+                    for (let i = 0; i < soldEvents.length; i++) {
+                        let timestamp = await utils.getDateFromBlock(soldEvents[i].blockNumber)
 
-            console.log(otokenName, 'totalBoughtByDate', totalBoughtByDate)
+                        // let date = new Date(timestamp * 1000).toDateString()
 
-            volumesArray.push({ name: otokenName, id: id, totalSoldByDate: totalSoldByDate, totalBoughtByDate: totalBoughtByDate })
+                        var date = moment.unix(timestamp).format("MM/DD/YY");
 
-            console.log(volumesArray)
 
-        }
+                        tokensSold.push({ date: date, tokensAmount: soldEvents[i].returnValues.tokens_sold })
+                    }
 
+                    let boughtEvents = await uniswapExchange.getPastEvents('TokenPurchase', {
+                        fromBlock: 0,
+                        toBlock: 'latest'
+                    });
+
+                    for (let i = 0; i < boughtEvents.length; i++) {
+                        let timestamp = await utils.getDateFromBlock(boughtEvents[i].blockNumber)
+
+                        // let date = new Date(timestamp * 1000).toDateString()
+
+                        var date = moment.unix(timestamp).format("MM/DD/YY");
+
+                        tokensBought.push({ date: date, tokensAmount: boughtEvents[i].returnValues.tokens_bought })
+                    }
+
+                    // console.log("tokensSold :", tokensSold, "tokensBought :", tokensBought)
+
+                    groupSoldByDate = groupAndSum(tokensSold, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
+
+
+                    let totalSoldByDate = await Promise.all(groupSoldByDate.map(async function (el) {
+                        // check if call
+                        
+                        let isCall = ((otokenStrikeAdd.toLowerCase() == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)) ? 
+                            true : 
+                            false
+                        // if call use multiplier
+                        let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000)) : false
+                        // if call token is eth
+                        let token = isCall ? ADDRESS_ZERO : otokenUnderlyingAdd.toLowerCase()
+
+                        let assetPrice = await getTokenPrice(token, el.date)
+
+                        let total = callMultiplier ? ((assetPrice * el.tokensAmount) / callMultiplier) : (assetPrice * el.tokensAmount)
+
+                        let o = Object.assign({}, el);
+                        o.assetPrice = assetPrice
+                        o.total = total
+                        return o;
+                    }))
+
+                    totCummulativeSold = 0
+                    totalSoldByDate.forEach(el =>
+                        el.cumulative = totCummulativeSold += el.total
+                    )
+
+                    console.log(otokenName, 'totalSoldByDate', totalSoldByDate)
+
+
+                    groupBoughtByDate = groupAndSum(tokensBought, otokenDecimals).sort((a, b) => new Date(a.date) - new Date(b.date))
+
+
+                    let totalBoughtByDate = await Promise.all(groupBoughtByDate.map(async function (el) {
+
+                        let callMultiplier = false
+                        let token = otokenUnderlyingAdd
+
+                        if ((otokenStrikeAdd === ADDRESS_ZERO) && (otokenUnderlyingAdd === registry.usdcAddress)) {
+                            callMultiplier = (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000));
+                            token = ADDRESS_ZERO
+                        }
+
+                        let assetPrice = await getTokenPrice(token, el.date)
+
+                        let total = callMultiplier ? ((assetPrice * el.tokensAmount) / callMultiplier) : (assetPrice * el.tokensAmount)
+
+                        let o = Object.assign({}, el);
+                        o.assetPrice = assetPrice
+                        o.total = total
+                        return o;
+                    }))
+
+                    totCummulativeBought = 0
+                    totalBoughtByDate.forEach(el =>
+                        el.cumulative = totCummulativeBought += el.total
+                    )
+
+                    console.log(otokenName, 'totalBoughtByDate', totalBoughtByDate)
+
+                    volumesArray.push({ name: otokenName, id: id, totalSoldByDate: totalSoldByDate, totalBoughtByDate: totalBoughtByDate })
+
+                }
+
+            })
+        )
+        
+    }
+
+    res = await getData().then( () => {
+        return volumesArray
     })
 
-    return volumesArray
+    return res
+
+    
 
 }
 
 getTokenPrice = async (address, date) => {
     let formattedAddress = address.toLowerCase()
-    console.log('getTokenPrice address', formattedAddress)
-    console.log('pdc:', address === registry.wethAddress.toLowerCase() ? ADDRESS_ZERO : formattedAddress)
     let tokenAddress = address === registry.wethAddress ? ADDRESS_ZERO : formattedAddress
-    console.log('getTokenPrice token', tokenAddress)
     prices = await checkHistoricalPrices(formattedAddress)
    
     let pricesByAddress = prices.filter(addr => addr.address === formattedAddress)[0].prices
@@ -170,7 +180,6 @@ getTokenPrice = async (address, date) => {
 
 checkHistoricalPrices = async (address) => {
     if (historicalPrices.filter(addr => addr.address === address).length === 0) {
-        console.log('checkHistoricalPrices', address)
         prices = await getHistoricalPriceCoingecko(address)
     } else {
         prices = historicalPrices
@@ -182,7 +191,6 @@ checkHistoricalPrices = async (address) => {
 getHistoricalPriceCoingecko = async (address) => {
     // formattedDate = convertDate(date)
     //var formattedDate = moment(date).format("DD-MM-YYYY");
-    console.log('getHistoricalPriceCoingecko', address)
     let formattedAddress = address.toLowerCase()
     // february 1st
     let startDate = new Date('01/01/2020').getTime() / 1000
