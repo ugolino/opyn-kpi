@@ -210,16 +210,15 @@ export default {
         { 
           let totalBought = option.totalBoughtByDate.slice(-1)[0] ? option.totalBoughtByDate.slice(-1)[0].cumulative : 0;
           let totalSold = option.totalSoldByDate.slice(-1)[0] ? option.totalSoldByDate.slice(-1)[0].cumulative : 0;
-          console.log(totalBought);
-          console.log(totalSold);
           return ({ 
+            id: option.id,
             name: option.name, 
             totalBought: totalBought,
             totalSold: totalSold,
             total: totalSold + totalBought
           })
         }
-      )
+      ).sort((a, b) => b.id - a.id)
     },
     chartDataForOption(){
       if (this.selectedOptionForChart) {
@@ -234,18 +233,20 @@ export default {
   mounted() {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
-    this.loadingInsuranceCoverageData = true
-    api.getKpi('insurance-coverage')
-    .then( res => {
-      this.getInsuranceCoverageData(res)
-      this.loadingInsuranceCoverageData = false
-    });
-    this.loadingUsdLockedData = true
-    api.getKpi('usd-locked')
-    .then( res => {
-      this.getUsdLockedData(res)
-      this.loadingUsdLockedData = false
-    });
+
+    // this.loadingInsuranceCoverageData = true
+    // api.getKpi('insurance-coverage')
+    // .then( res => {
+    //   this.getInsuranceCoverageData(res)
+    //   this.loadingInsuranceCoverageData = false
+    // });
+
+    // this.loadingUsdLockedData = true
+    // api.getKpi('usd-locked')
+    // .then( res => {
+    //   this.getUsdLockedData(res)
+    //   this.loadingUsdLockedData = false
+    // });
 
     this.loadingVolumesByDay = true
     api.getKpi('volumes-by-day')
