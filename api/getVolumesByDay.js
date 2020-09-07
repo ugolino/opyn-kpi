@@ -4,6 +4,22 @@ const registry = require('./registry');
 const fetch = require("node-fetch");
 const moment = require('moment');
 
+const db = require('./firebase')
+
+console.log(db)
+
+// db.collection("users").add({
+//     first: "Ada",
+//     last: "Lovelace",
+//     born: 1815
+// })
+// .then(function (docRef) {
+//     console.log("Document written with ID: ", docRef.id);
+// })
+// .catch(function (error) {
+//     console.error("Error adding document: ", error);
+// });
+
 const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 const historicalPrices = []
@@ -17,9 +33,9 @@ exports.run = async (tokens) => {
     const getData = async () => {
 
         return Promise.all(
-            tokens.slice().map(async(token, i) => {
+            tokens.slice(Math.max(tokens.length - 2, 1)).map(async(token, i) => {
 
-
+                let otokenAddress = await token.address; // oToken address
                 let otokenName = await token.methods.name().call(); // oToken name
                 let otokenDecimals = await token.methods.decimals().call();    // oToken decimals
                 let otokenUnderlyingAdd = await token.methods.underlying().call();    // oToken underlying token address
@@ -55,6 +71,21 @@ exports.run = async (tokens) => {
                         // let date = new Date(timestamp * 1000).toDateString()
 
                         var date = moment.unix(timestamp).format("MM/DD/YY");
+
+                        const save = await db.collection("tokenSolds").add({
+                            otokenAddress: otokenAddress,
+                            tokensAmount: soldEvents[i].returnValues.tokens_sold,
+                            date: date,
+                            block: soldEvents[i].blockNumber
+                        })
+                        // .then(function (docRef) {
+                        //     console.log("Document written with ID: ", docRef.id);
+                        // })
+                        // .catch(function (error) {
+                        //     console.error("Error adding document: ", error);
+                        // });
+
+                        console.log(save.id)
 
 
                         tokensSold.push({ date: date, tokensAmount: soldEvents[i].returnValues.tokens_sold })
