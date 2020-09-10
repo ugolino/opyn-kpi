@@ -7,7 +7,7 @@
           <p class="card-header-title">Total Volumes By Day</p>
         </header>
         <div class="card-content">
-          <column-chart :data="totalVolumesByDay" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+          <column-chart :data="totalVolumesByDay" :spanGaps="true"  thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@
               </div>
             </div>
           </div>
-            <column-chart :data="chartDataForOption" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+            <column-chart :data="chartDataForOption" :zeros="true" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
         <div v-else>
             Select an option to see details
@@ -234,19 +234,19 @@ export default {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
 
-    this.loadingInsuranceCoverageData = true
-    api.getKpi('insurance-coverage')
-    .then( res => {
-      this.getInsuranceCoverageData(res)
-      this.loadingInsuranceCoverageData = false
-    });
+    // this.loadingInsuranceCoverageData = true
+    // api.getKpi('insurance-coverage')
+    // .then( res => {
+    //   this.getInsuranceCoverageData(res)
+    //   this.loadingInsuranceCoverageData = false
+    // });
 
-    this.loadingUsdLockedData = true
-    api.getKpi('usd-locked')
-    .then( res => {
-      this.getUsdLockedData(res)
-      this.loadingUsdLockedData = false
-    });
+    // this.loadingUsdLockedData = true
+    // api.getKpi('usd-locked')
+    // .then( res => {
+    //   this.getUsdLockedData(res)
+    //   this.loadingUsdLockedData = false
+    // });
 
     this.loadingVolumesByDay = true
     api.getKpi('volumes-by-day')
