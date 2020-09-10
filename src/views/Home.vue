@@ -7,7 +7,7 @@
           <p class="card-header-title">Total Volumes By Day</p>
         </header>
         <div class="card-content">
-          <column-chart :data="totalVolumesByDay" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+          <column-chart :data="totalVolumesByDay" :spanGaps="true"  thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -76,7 +76,7 @@
               </div>
             </div>
           </div>
-            <column-chart :data="chartDataForOption" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+            <column-chart :data="chartDataForOption" :zeros="true" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
         <div v-else>
             Select an option to see details
