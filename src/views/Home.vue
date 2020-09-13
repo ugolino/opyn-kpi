@@ -4,10 +4,26 @@
     <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
-          <p class="card-header-title">Total Volumes By Day</p>
+          <p class="card-header-title">Total Volumes</p>
         </header>
         <div class="card-content">
-          <column-chart :data="totalVolumesByDay" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+          <div class="columns">
+            <div class="column">
+              <div class="buttons my-4">
+                <b-button @click="selectedTimeFrameForVolumeChart = 'daily'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'daily'}" type="is-primary">
+                  daily
+                </b-button>
+                <b-button @click="selectedTimeFrameForVolumeChart = 'weekly'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'weekly'}" type="is-primary">
+                  weekly
+                </b-button>
+                <b-button @click="selectedTimeFrameForVolumeChart = 'monthly'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'monthly'}" type="is-primary">
+                  monthly
+                </b-button>
+              </div>
+            </div>
+          </div>
+
+          <column-chart :data="returnTotVolumes" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -67,6 +83,9 @@
           <div class="columns">
             <div class="column">
               <div class="buttons my-4">
+                <b-button @click="selectedTypeForChart = 'total'" :class="{'is-outlined' : selectedTypeForChart != 'total'}" type="is-primary">
+                  Total
+                </b-button>
                 <b-button @click="selectedTypeForChart = 'totalSold'" :class="{'is-outlined' : selectedTypeForChart != 'totalSold'}" type="is-primary">
                   Sold
                 </b-button>
@@ -170,7 +189,8 @@ export default {
       loadingVolumesByDay: false,
       showMoreOptions: false,
       selectedOptionForChart: null,
-      selectedTypeForChart: 'totalSold'
+      selectedTypeForChart: 'totalSold',
+      selectedTimeFrameForVolumeChart: 'daily'
     }
   },
   computed: {
@@ -200,10 +220,38 @@ export default {
           totalVolumes.push({date: item.date, total: item.total})
         )
       )
-      let arrayTotVolumesByDay = this.groupAndSum(totalVolumes)
-      return arrayTotVolumesByDay.sort((a, b) => new Date(a.date) - new Date(b.date)).map ( item =>
-        Object.values({ date: item.date, value: item.total })
-      )
+      let arrayTotVolumesByDay = this.groupAndSum(totalVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
+      let startDate = this.$moment(arrayTotVolumesByDay[0].date).format('MM/DD/YY')
+      let endDate = this.$moment().format('MM/DD/YY')
+     
+      let dateArray = this.getDates(startDate, endDate)
+
+      let arrayTotVolumesByDayInclude0 = []
+
+      dateArray.map ( date => {
+        let value = arrayTotVolumesByDay.filter( item => item.date === date ).length > 0 ? arrayTotVolumesByDay.filter( item => item.date === date )[0].total : 0
+        arrayTotVolumesByDayInclude0.push({ date: date, value: value })
+      })
+
+      return arrayTotVolumesByDayInclude0
+
+
+    },
+
+    returnTotVolumes(){
+      let array = []
+      if (this.selectedTimeFrameForVolumeChart === "daily") {
+        array = this.totalVolumesByDay
+      } else if (this.selectedTimeFrameForVolumeChart === "weekly") {
+        array = this.groupAndSumByWeeks(this.totalVolumesByDay)
+      } else if (this.selectedTimeFrameForVolumeChart === "monthly") {
+        array = this.groupAndSumByMonths(this.totalVolumesByDay)
+      }
+
+      return array.map ( item => {
+        return Object.values({ date: item.date, value: item. value})
+      })
+
     },
     optionsList(){
       return this.volumesByDay.map ( option => 
@@ -222,11 +270,47 @@ export default {
     },
     chartDataForOption(){
       if (this.selectedOptionForChart) {
-        if (this.selectedTypeForChart === 'totalBought') {
-          return this.selectedOptionForChart.totalBoughtByDate.map ( item => Object.values({ date: item.date, value: item.total }) )
+
+        let totals = []
+        this.selectedOptionForChart.totalBoughtByDate.map ( totalBought => totals.push(totalBought))
+        this.selectedOptionForChart.totalSoldByDate.map ( totalSold => totals.push(totalSold))
+
+        let sortedTotals = totals.sort((a, b) => new Date(a.date) - new Date(b.date))
+
+        console.log(sortedTotals)
+
+        let startDate = this.$moment(sortedTotals[0].date).format('MM/DD/YY')
+        console.log(startDate)
+        
+        let endDate = this.$moment(sortedTotals[sortedTotals.length - 1].date).format('MM/DD/YY')
+        console.log(endDate)
+
+        let dateArray = this.getDates(startDate, endDate)
+
+        let chartArray = []
+
+        if (this.selectedTypeForChart === 'total') {
+            let groupedArray = _(totals).groupBy( item => this.$moment(item.date, 'MM/DD/YY') )
+            .map((objs, key) => ({
+              'date': this.$moment(key).format('MM/DD/YY'),
+              'total': _.sumBy(objs, 'total') }))
+            .value()
+            chartArray = groupedArray
+        } else if (this.selectedTypeForChart === 'totalBought') {
+          chartArray = this.selectedOptionForChart.totalBoughtByDate
         } else if (this.selectedTypeForChart === 'totalSold') {
-          return this.selectedOptionForChart.totalSoldByDate.map ( item => Object.values({ date: item.date, value: item.total }) )
+          chartArray = this.selectedOptionForChart.totalSoldByDate
         }
+
+        let chartArrayInclude0 = []
+
+        dateArray.map ( date => {
+          let value = chartArray.filter( item => item.date === date ).length > 0 ? chartArray.filter( item => item.date === date )[0].total : 0
+          chartArrayInclude0.push({ date: date, value: value })
+        })
+
+        return chartArrayInclude0.map ( item => Object.values({ date: item.date, value: item.value }) )
+
       }
     }
   },
@@ -234,26 +318,26 @@ export default {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
 
-    this.loadingInsuranceCoverageData = true
-    api.getKpi('insurance-coverage')
-    .then( res => {
-      this.getInsuranceCoverageData(res)
-      this.loadingInsuranceCoverageData = false
-    });
+    // this.loadingInsuranceCoverageData = true
+    // api.getKpi('insurance-coverage')
+    // .then( res => {
+    //   this.getInsuranceCoverageData(res)
+    //   this.loadingInsuranceCoverageData = false
+    // });
 
-    this.loadingUsdLockedData = true
-    api.getKpi('usd-locked')
-    .then( res => {
-      this.getUsdLockedData(res)
-      this.loadingUsdLockedData = false
-    });
+    // this.loadingUsdLockedData = true
+    // api.getKpi('usd-locked')
+    // .then( res => {
+    //   this.getUsdLockedData(res)
+    //   this.loadingUsdLockedData = false
+    // });
 
-    this.loadingVolumesByDay = true
-    api.getKpi('volumes-by-day')
-    .then( res => {
-      this.getVolumesByDay(res)
-      this.loadingVolumesByDay = false
-    });
+    // this.loadingVolumesByDay = true
+    // api.getKpi('volumes-by-day')
+    // .then( res => {
+    //   this.getVolumesByDay(res)
+    //   this.loadingVolumesByDay = false
+    // });
 
     if (!this.chartDataLastUpdate ||  ( (Math.abs(Date.now() - this.chartDataLastUpdate) / 36e5) > 12 ) ) {
       console.log('get history all')
@@ -298,10 +382,51 @@ export default {
 
       return groupedArray
     },
+
     showOptionOnChart(name){
       let self = this
+      this.selectedTypeForChart = "total"
       self.selectedOptionForChart = self.volumesByDay.filter( option => option.name === name )[0]
-    }
+    },
+
+    getDates(startDate, endDate) {
+      var dateArray = [];
+      var currentDate = this.$moment(startDate);
+      var endDate = this.$moment(endDate);
+      while (currentDate <= endDate) {
+          dateArray.push( this.$moment(currentDate).format('MM/DD/YY') )
+          currentDate = this.$moment(currentDate).add(1, 'days');
+      }
+      return dateArray;
+    },
+
+    groupAndSumByWeeks(array){
+      let groupedResults = _(array)
+      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('isoWeek') )
+      .map((objs, key) => ({
+        'date': this.$moment(key).format('MM/DD/YY'),
+        'value': _.sumBy(objs, 'value') }))
+      .value()
+
+      return groupedResults
+
+    },
+
+    groupAndSumByMonths(array){
+
+      let groupedResults = _(array)
+      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('month') )
+      .map((objs, key) => ({
+        'date': this.$moment(key).format('MMM YY'),
+        'value': _.sumBy(objs, 'value') }))
+      .value()
+
+      return groupedResults
+
+    },
+    
+
+
   }
 }
 </script>

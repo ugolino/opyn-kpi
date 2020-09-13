@@ -12,6 +12,9 @@ import Chart from 'chart.js'
 import VueMoment from 'vue-moment'
 import moment from 'moment-timezone'
 
+import VueLodash from 'vue-lodash'
+import lodash from 'lodash'
+
 
 Vue.use(VueMoment, {
   moment,
@@ -22,6 +25,8 @@ Vue.use(Buefy);
 Vue.config.productionTip = false;
 
 Vue.use(Chartkick.use(Chart))
+
+Vue.use(VueLodash, { lodash: lodash })
 
 
 // var numeral = require("numeral");
