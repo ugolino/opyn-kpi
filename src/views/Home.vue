@@ -324,9 +324,9 @@ export default {
       if (this.selectedTimeFrameForVolumeChart === "daily") {
         array = this.totalVolumesByDay
       } else if (this.selectedTimeFrameForVolumeChart === "weekly") {
-        array = totVolumesByWeek()
+        array = this.totVolumesByWeek()
       } else if (this.selectedTimeFrameForVolumeChart === "monthly") {
-        array = totVolumesByMonth()
+        array = this.totVolumesByMonth()
       }
 
       return array.map ( item => {
@@ -402,10 +402,10 @@ export default {
       return this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value
     },
     currentMonthVolume(){
-      return this.totVolumesByWeek[this.totVolumesByMonth.length - 1 ].value
+      return this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ].value
     },
     previousMonthVolume(){
-      return this.totVolumesByWeek[this.totVolumesByMonth.length - 2].value
+      return this.totVolumesByMonth[this.totVolumesByMonth.length - 2].value
     }
 
 
