@@ -5,6 +5,11 @@
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">Daily Volumes</p>
+          <radar-spinner
+            v-if="loadingVolumesByDay"
+            :size="20"
+            class="my-4 mb-4"
+          />
         </header>
         <div class="card-content">
           <div class="columns">
@@ -28,6 +33,11 @@
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">Weekly Volumes</p>
+          <radar-spinner
+            v-if="loadingVolumesByDay"
+            :size="20"
+            class="my-4 mb-4"
+          />
         </header>
         <div class="card-content">
           <div class="columns">
@@ -51,6 +61,11 @@
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">Monthly Volumes</p>
+          <radar-spinner
+            v-if="loadingVolumesByDay"
+            :size="20"
+            class="my-4 mb-4"
+          />
         </header>
         <div class="card-content">
           <div class="columns">
@@ -78,6 +93,11 @@
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">Total Volumes</p>
+          <radar-spinner
+            v-if="loadingVolumesByDay"
+            :size="20"
+            class="my-4 mb-4"
+          />
         </header>
         <div class="card-content">
           <div class="columns">
@@ -324,9 +344,9 @@ export default {
       if (this.selectedTimeFrameForVolumeChart === "daily") {
         array = this.totalVolumesByDay
       } else if (this.selectedTimeFrameForVolumeChart === "weekly") {
-        array = this.totVolumesByWeek()
+        array = this.totVolumesByWeek
       } else if (this.selectedTimeFrameForVolumeChart === "monthly") {
-        array = this.totVolumesByMonth()
+        array = this.totVolumesByMonth
       }
 
       return array.map ( item => {
