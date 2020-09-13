@@ -15,10 +15,15 @@ import moment from 'moment-timezone'
 import VueLodash from 'vue-lodash'
 import lodash from 'lodash'
 
+import vueNumeralFilterInstaller from 'vue-numeral-filter';
+
 
 Vue.use(VueMoment, {
   moment,
 })
+
+Vue.use(vueNumeralFilterInstaller, { currency: 'USD', locale: 'en' });
+
 
 Vue.use(Buefy);
 
@@ -28,12 +33,6 @@ Vue.use(Chartkick.use(Chart))
 
 Vue.use(VueLodash, { lodash: lodash })
 
-
-// var numeral = require("numeral");
-
-// Vue.filter("formatThousands", function (value) {
-//   return numeral(value).format("0a");
-// });
 
 new Vue({
   router,

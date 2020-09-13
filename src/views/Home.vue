@@ -1,6 +1,79 @@
 <template>
   <div class="columns is-multiline my-4 ">
 
+    <div class="column">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Daily Volumes</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              today 
+              <h3 class="title">
+                {{ todayVolume | numeral('$0.0a') }}
+                <span class="subtitle">{{ (((  todayVolume / yesterdayVolume ) - 1)) | numeral('+0%') }}</span>
+              </h3>
+            </div>
+            <div class="column">
+              yesterday 
+              <h3 class="title">{{ yesterdayVolume | numeral('$0.0a') }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Weekly Volumes</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              current week 
+              <h3 class="title">
+                {{ currentWeekVolume | numeral('$0.0a') }}
+                <span class="subtitle">{{ (((  currentWeekVolume / previousWeekVolume ) - 1)) | numeral('+0%') }}</span>
+              </h3>
+            </div>
+            <div class="column">
+              previuos week 
+              <h3 class="title">{{ previousWeekVolume | numeral('$0.0a') }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Monthly Volumes</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              current month 
+              <h3 class="title">
+                {{ currentMonthVolume | numeral('$0.0a') }}
+                <span class="subtitle">{{ (((  currentMonthVolume / previousMonthVolume ) - 1)) | numeral('+0%') }}</span>
+              </h3>
+            </div>
+            <div class="column">
+              previuos month 
+              <h3 class="title">{{ previousMonthVolume | numeral('$0.0a') }}</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    
+
     <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
@@ -238,14 +311,22 @@ export default {
 
     },
 
+    totVolumesByWeek(){
+      return this.groupAndSumByWeeks(this.totalVolumesByDay)
+    },
+
+    totVolumesByMonth(){
+      return this.groupAndSumByMonths(this.totalVolumesByDay)
+    },
+
     returnTotVolumes(){
       let array = []
       if (this.selectedTimeFrameForVolumeChart === "daily") {
         array = this.totalVolumesByDay
       } else if (this.selectedTimeFrameForVolumeChart === "weekly") {
-        array = this.groupAndSumByWeeks(this.totalVolumesByDay)
+        array = totVolumesByWeek()
       } else if (this.selectedTimeFrameForVolumeChart === "monthly") {
-        array = this.groupAndSumByMonths(this.totalVolumesByDay)
+        array = totVolumesByMonth()
       }
 
       return array.map ( item => {
@@ -276,14 +357,8 @@ export default {
         this.selectedOptionForChart.totalSoldByDate.map ( totalSold => totals.push(totalSold))
 
         let sortedTotals = totals.sort((a, b) => new Date(a.date) - new Date(b.date))
-
-        console.log(sortedTotals)
-
         let startDate = this.$moment(sortedTotals[0].date).format('MM/DD/YY')
-        console.log(startDate)
-        
         let endDate = this.$moment(sortedTotals[sortedTotals.length - 1].date).format('MM/DD/YY')
-        console.log(endDate)
 
         let dateArray = this.getDates(startDate, endDate)
 
@@ -312,32 +387,54 @@ export default {
         return chartArrayInclude0.map ( item => Object.values({ date: item.date, value: item.value }) )
 
       }
+    },
+
+    todayVolume(){
+      return this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value
+    },
+    yesterdayVolume(){
+      return this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value
+    },
+    currentWeekVolume(){
+      return this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value
+    },
+    previousWeekVolume(){
+      return this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value
+    },
+    currentMonthVolume(){
+      return this.totVolumesByWeek[this.totVolumesByMonth.length - 1 ].value
+    },
+    previousMonthVolume(){
+      return this.totVolumesByWeek[this.totVolumesByMonth.length - 2].value
     }
+
+
+
   },
   mounted() {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
 
-    // this.loadingInsuranceCoverageData = true
-    // api.getKpi('insurance-coverage')
-    // .then( res => {
-    //   this.getInsuranceCoverageData(res)
-    //   this.loadingInsuranceCoverageData = false
-    // });
+    this.loadingInsuranceCoverageData = true
+    api.getKpi('insurance-coverage')
+    .then( res => {
+      this.getInsuranceCoverageData(res)
+      this.loadingInsuranceCoverageData = false
+    });
 
-    // this.loadingUsdLockedData = true
-    // api.getKpi('usd-locked')
-    // .then( res => {
-    //   this.getUsdLockedData(res)
-    //   this.loadingUsdLockedData = false
-    // });
+    this.loadingUsdLockedData = true
+    api.getKpi('usd-locked')
+    .then( res => {
+      this.getUsdLockedData(res)
+      this.loadingUsdLockedData = false
+    });
 
-    // this.loadingVolumesByDay = true
-    // api.getKpi('volumes-by-day')
-    // .then( res => {
-    //   this.getVolumesByDay(res)
-    //   this.loadingVolumesByDay = false
-    // });
+    this.loadingVolumesByDay = true
+    api.getKpi('volumes-by-day')
+    .then( res => {
+      this.getVolumesByDay(res)
+      this.loadingVolumesByDay = false
+    });
 
     if (!this.chartDataLastUpdate ||  ( (Math.abs(Date.now() - this.chartDataLastUpdate) / 36e5) > 12 ) ) {
       console.log('get history all')

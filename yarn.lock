@@ -9256,6 +9256,13 @@ vue-moment@^4.1.0:
   dependencies:
     moment "^2.19.2"
 
+vue-numeral-filter@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/vue-numeral-filter/-/vue-numeral-filter-2.0.0.tgz#a28f4f795d66c8555fb521498ed846418150fa5e"
+  integrity sha512-7k9ALqulfOWbxRFKOR04EPWAxk95FHOeO1uIDn1x8n5+ODmE8DdU2STQ+AO2WFXdf1VNQvZPwQRE7hNOLQQY+Q==
+  dependencies:
+    numeral "^2.0.6"
+
 vue-router@^3.2.0:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.3.3.tgz#92603966921f3f0c7e9ff3881cf0b7ab311533df"
