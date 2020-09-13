@@ -6125,11 +6125,6 @@ lodash@^4.0.0, lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.1
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
-lodash@^4.17.20:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
-
 log-symbols@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-2.2.0.tgz#5740e1c5d6f0dfda4ad9323b5332107ef6b4c40a"
@@ -9800,24 +9795,12 @@ vue-loading-spinner@^1.0.11:
     sass-loader "^6.0.6"
     vue "^2.3.3"
 
-vue-lodash@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/vue-lodash/-/vue-lodash-2.1.2.tgz#1ec2b1471ee289518e8d285250a25516adee6c51"
-  integrity sha512-6QsNC7/XjrK4xKxFhh6Ppvcrfm0uAeR/lFsySsMgfEFUWkvRztcAIS3MsqAI4bBnAaLo9ou+8tUfJ8d+yrljQg==
-
 vue-moment@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/vue-moment/-/vue-moment-4.1.0.tgz#092a8ff723a96c6f85a0a8e23ad30f0bf320f3b0"
   integrity sha512-Gzisqpg82ItlrUyiD9d0Kfru+JorW2o4mQOH06lEDZNgxci0tv/fua1Hl0bo4DozDV2JK1r52Atn/8QVCu8qQw==
   dependencies:
     moment "^2.19.2"
-
-vue-numeral-filter@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/vue-numeral-filter/-/vue-numeral-filter-2.0.0.tgz#a28f4f795d66c8555fb521498ed846418150fa5e"
-  integrity sha512-7k9ALqulfOWbxRFKOR04EPWAxk95FHOeO1uIDn1x8n5+ODmE8DdU2STQ+AO2WFXdf1VNQvZPwQRE7hNOLQQY+Q==
-  dependencies:
-    numeral "^2.0.6"
 
 vue-router@^3.2.0:
   version "3.3.3"

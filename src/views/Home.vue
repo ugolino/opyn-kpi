@@ -1,102 +1,13 @@
 <template>
   <div class="columns is-multiline my-4 ">
 
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Daily Volumes</p>
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              today 
-              <h3 class="title">
-                {{ todayVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  todayVolume / yesterdayVolume ) - 1)) | numeral('+0%') }}</span>
-              </h3>
-            </div>
-            <div class="column">
-              yesterday 
-              <h3 class="title">{{ yesterdayVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Weekly Volumes</p>
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              current week 
-              <h3 class="title">
-                {{ currentWeekVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  currentWeekVolume / previousWeekVolume ) - 1)) | numeral('+0%') }}</span>
-              </h3>
-            </div>
-            <div class="column">
-              previuos week 
-              <h3 class="title">{{ previousWeekVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Monthly Volumes</p>
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              current month 
-              <h3 class="title">
-                {{ currentMonthVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  currentMonthVolume / previousMonthVolume ) - 1)) | numeral('+0%') }}</span>
-              </h3>
-            </div>
-            <div class="column">
-              previuos month 
-              <h3 class="title">{{ previousMonthVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-    
-
     <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
-          <p class="card-header-title">Total Volumes</p>
+          <p class="card-header-title">Total Volumes By Day</p>
         </header>
         <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              <div class="buttons my-4">
-                <b-button @click="selectedTimeFrameForVolumeChart = 'daily'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'daily'}" type="is-primary">
-                  daily
-                </b-button>
-                <b-button @click="selectedTimeFrameForVolumeChart = 'weekly'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'weekly'}" type="is-primary">
-                  weekly
-                </b-button>
-                <b-button @click="selectedTimeFrameForVolumeChart = 'monthly'" :class="{'is-outlined' : selectedTimeFrameForVolumeChart != 'monthly'}" type="is-primary">
-                  monthly
-                </b-button>
-              </div>
-            </div>
-          </div>
-
-          <column-chart :data="returnTotVolumes" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+          <column-chart :data="totalVolumesByDay" :spanGaps="true"  thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -156,9 +67,6 @@
           <div class="columns">
             <div class="column">
               <div class="buttons my-4">
-                <b-button @click="selectedTypeForChart = 'total'" :class="{'is-outlined' : selectedTypeForChart != 'total'}" type="is-primary">
-                  Total
-                </b-button>
                 <b-button @click="selectedTypeForChart = 'totalSold'" :class="{'is-outlined' : selectedTypeForChart != 'totalSold'}" type="is-primary">
                   Sold
                 </b-button>
@@ -262,8 +170,7 @@ export default {
       loadingVolumesByDay: false,
       showMoreOptions: false,
       selectedOptionForChart: null,
-      selectedTypeForChart: 'totalSold',
-      selectedTimeFrameForVolumeChart: 'daily'
+      selectedTypeForChart: 'totalSold'
     }
   },
   computed: {
@@ -293,46 +200,10 @@ export default {
           totalVolumes.push({date: item.date, total: item.total})
         )
       )
-      let arrayTotVolumesByDay = this.groupAndSum(totalVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
-      let startDate = this.$moment(arrayTotVolumesByDay[0].date).format('MM/DD/YY')
-      let endDate = this.$moment().format('MM/DD/YY')
-     
-      let dateArray = this.getDates(startDate, endDate)
-
-      let arrayTotVolumesByDayInclude0 = []
-
-      dateArray.map ( date => {
-        let value = arrayTotVolumesByDay.filter( item => item.date === date ).length > 0 ? arrayTotVolumesByDay.filter( item => item.date === date )[0].total : 0
-        arrayTotVolumesByDayInclude0.push({ date: date, value: value })
-      })
-
-      return arrayTotVolumesByDayInclude0
-
-
-    },
-
-    totVolumesByWeek(){
-      return this.groupAndSumByWeeks(this.totalVolumesByDay)
-    },
-
-    totVolumesByMonth(){
-      return this.groupAndSumByMonths(this.totalVolumesByDay)
-    },
-
-    returnTotVolumes(){
-      let array = []
-      if (this.selectedTimeFrameForVolumeChart === "daily") {
-        array = this.totalVolumesByDay
-      } else if (this.selectedTimeFrameForVolumeChart === "weekly") {
-        array = totVolumesByWeek()
-      } else if (this.selectedTimeFrameForVolumeChart === "monthly") {
-        array = totVolumesByMonth()
-      }
-
-      return array.map ( item => {
-        return Object.values({ date: item.date, value: item. value})
-      })
-
+      let arrayTotVolumesByDay = this.groupAndSum(totalVolumes)
+      return arrayTotVolumesByDay.sort((a, b) => new Date(a.date) - new Date(b.date)).map ( item =>
+        Object.values({ date: item.date, value: item.total })
+      )
     },
     optionsList(){
       return this.volumesByDay.map ( option => 
@@ -351,65 +222,13 @@ export default {
     },
     chartDataForOption(){
       if (this.selectedOptionForChart) {
-
-        let totals = []
-        this.selectedOptionForChart.totalBoughtByDate.map ( totalBought => totals.push(totalBought))
-        this.selectedOptionForChart.totalSoldByDate.map ( totalSold => totals.push(totalSold))
-
-        let sortedTotals = totals.sort((a, b) => new Date(a.date) - new Date(b.date))
-        let startDate = this.$moment(sortedTotals[0].date).format('MM/DD/YY')
-        let endDate = this.$moment(sortedTotals[sortedTotals.length - 1].date).format('MM/DD/YY')
-
-        let dateArray = this.getDates(startDate, endDate)
-
-        let chartArray = []
-
-        if (this.selectedTypeForChart === 'total') {
-            let groupedArray = _(totals).groupBy( item => this.$moment(item.date, 'MM/DD/YY') )
-            .map((objs, key) => ({
-              'date': this.$moment(key).format('MM/DD/YY'),
-              'total': _.sumBy(objs, 'total') }))
-            .value()
-            chartArray = groupedArray
-        } else if (this.selectedTypeForChart === 'totalBought') {
-          chartArray = this.selectedOptionForChart.totalBoughtByDate
+        if (this.selectedTypeForChart === 'totalBought') {
+          return this.selectedOptionForChart.totalBoughtByDate.map ( item => Object.values({ date: item.date, value: item.total }) )
         } else if (this.selectedTypeForChart === 'totalSold') {
-          chartArray = this.selectedOptionForChart.totalSoldByDate
+          return this.selectedOptionForChart.totalSoldByDate.map ( item => Object.values({ date: item.date, value: item.total }) )
         }
-
-        let chartArrayInclude0 = []
-
-        dateArray.map ( date => {
-          let value = chartArray.filter( item => item.date === date ).length > 0 ? chartArray.filter( item => item.date === date )[0].total : 0
-          chartArrayInclude0.push({ date: date, value: value })
-        })
-
-        return chartArrayInclude0.map ( item => Object.values({ date: item.date, value: item.value }) )
-
       }
-    },
-
-    todayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value
-    },
-    yesterdayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value
-    },
-    currentWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value
-    },
-    previousWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value
-    },
-    currentMonthVolume(){
-      return this.totVolumesByWeek[this.totVolumesByMonth.length - 1 ].value
-    },
-    previousMonthVolume(){
-      return this.totVolumesByWeek[this.totVolumesByMonth.length - 2].value
     }
-
-
-
   },
   mounted() {
     this.endDate = this.$moment().format('YYYY-MM-DD');
@@ -479,51 +298,10 @@ export default {
 
       return groupedArray
     },
-
     showOptionOnChart(name){
       let self = this
-      this.selectedTypeForChart = "total"
       self.selectedOptionForChart = self.volumesByDay.filter( option => option.name === name )[0]
-    },
-
-    getDates(startDate, endDate) {
-      var dateArray = [];
-      var currentDate = this.$moment(startDate);
-      var endDate = this.$moment(endDate);
-      while (currentDate <= endDate) {
-          dateArray.push( this.$moment(currentDate).format('MM/DD/YY') )
-          currentDate = this.$moment(currentDate).add(1, 'days');
-      }
-      return dateArray;
-    },
-
-    groupAndSumByWeeks(array){
-      let groupedResults = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('isoWeek') )
-      .map((objs, key) => ({
-        'date': this.$moment(key).format('MM/DD/YY'),
-        'value': _.sumBy(objs, 'value') }))
-      .value()
-
-      return groupedResults
-
-    },
-
-    groupAndSumByMonths(array){
-
-      let groupedResults = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('month') )
-      .map((objs, key) => ({
-        'date': this.$moment(key).format('MMM YY'),
-        'value': _.sumBy(objs, 'value') }))
-      .value()
-
-      return groupedResults
-
-    },
-    
-
-
+    }
   }
 }
 </script>
