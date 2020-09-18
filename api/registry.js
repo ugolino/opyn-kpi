@@ -4,10 +4,6 @@ module.exports = {
         "0xcC5d905b9c2c8C9329Eb4e25dc086369D6C7777C"  // oEth factory
     ],
 
-    acoFactory: [
-        "0x176b98ab38d1aE8fF3F30bF07f9B93E26F559C17"  // oEth factory
-    ],
-
     uniswapFactory : "0xc0a47dfe034b400b47bdad5fecda2621de6c4d95",    // uniswap factory address
     
     yDai : "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8",
