@@ -17,7 +17,9 @@
               today 
               <h3 class="title">
                 {{ todayVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  todayVolume / yesterdayVolume ) - 1)) | numeral('+0%') }}</span>
+                <span class="subtitle" v-if="todayVolume != '-' && yesterdayVolume != '-'">
+                  {{ (((  todayVolume / yesterdayVolume ) - 1)) | numeral('+0%') }}
+                </span>
               </h3>
             </div>
             <div class="column">
@@ -45,7 +47,9 @@
               current week 
               <h3 class="title">
                 {{ currentWeekVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  currentWeekVolume / previousWeekVolume ) - 1)) | numeral('+0%') }}</span>
+                <span class="subtitle" v-if="currentWeekVolume != '-' && previousWeekVolume != '-'">
+                  {{ (((  currentWeekVolume / previousWeekVolume ) - 1)) | numeral('+0%') }}
+                </span>
               </h3>
             </div>
             <div class="column">
@@ -73,7 +77,9 @@
               current month 
               <h3 class="title">
                 {{ currentMonthVolume | numeral('$0.0a') }}
-                <span class="subtitle">{{ (((  currentMonthVolume / previousMonthVolume ) - 1)) | numeral('+0%') }}</span>
+                <span class="subtitle" v-if="currentMonthVolume != '-' && previousMonthVolume != '-'">
+                  {{ (((  currentMonthVolume / previousMonthVolume ) - 1)) | numeral('+0%') }}
+                </span>
               </h3>
             </div>
             <div class="column">
@@ -84,10 +90,6 @@
         </div>
       </div>
     </div>
-
-
-
-    
 
     <div class="column is-full">
       <div class="card has-text-centered">
@@ -192,6 +194,17 @@
         </div>
         <div v-else>
             Select an option to see details
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-full">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Weekly Users</p>
+        </header>
+        <div class="card-content">
+          <column-chart :stacked="true" :data="chartDataForUser" thousands="," :colors="['#1abc9c', '#94849B']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -410,24 +423,67 @@ export default {
     },
 
     todayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value
+      return this.totalVolumesByDay[this.totalVolumesByDay.length - 1] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value : ''
     },
     yesterdayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value
+      return this.totalVolumesByDay[this.totalVolumesByDay.length - 2] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value : '-'
     },
     currentWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value
+      return this.totVolumesByWeek[this.totVolumesByWeek.length - 1] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value : '-'
     },
     previousWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value
+      return this.totVolumesByWeek[this.totVolumesByWeek.length - 2] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value : '-'
     },
     currentMonthVolume(){
-      return this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ].value
+      return this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ].value : '-'
     },
     previousMonthVolume(){
-      return this.totVolumesByMonth[this.totVolumesByMonth.length - 2].value
-    }
+      return this.totVolumesByMonth[this.totVolumesByMonth.length - 2] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 2].value : '-'
+    },
 
+    totSoldUsers(){
+      let allTransactions = []
+      this.volumesByDay.map( item => {
+        item.rawTotalSold.map ( transaction =>{
+          allTransactions.push(transaction)
+        })
+      })
+      return allTransactions
+    },
+
+    totBoughtUsers(){
+      let allTransactions = []
+      this.volumesByDay.map( item => {
+        item.rawTotalBought.map ( transaction =>{
+          allTransactions.push(transaction)
+        })
+      })
+      return allTransactions
+    },
+
+    chartDataForUser(){
+
+      let totSold = this.usersByWeek(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+        item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+      )
+      let totBought = this.usersByWeek(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+        item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+      )
+
+
+      return [
+        { 
+          name: 'sold',
+          data: totSold
+        },
+        { 
+          name: 'bought',
+          data: totBought
+        }
+
+      ]
+
+    }
 
 
   },
@@ -435,26 +491,26 @@ export default {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
 
-    this.loadingInsuranceCoverageData = true
-    api.getKpi('insurance-coverage')
-    .then( res => {
-      this.getInsuranceCoverageData(res)
-      this.loadingInsuranceCoverageData = false
-    });
+    // this.loadingInsuranceCoverageData = true
+    // api.getKpi('insurance-coverage')
+    // .then( res => {
+    //   this.getInsuranceCoverageData(res)
+    //   this.loadingInsuranceCoverageData = false
+    // });
 
-    this.loadingUsdLockedData = true
-    api.getKpi('usd-locked')
-    .then( res => {
-      this.getUsdLockedData(res)
-      this.loadingUsdLockedData = false
-    });
+    // this.loadingUsdLockedData = true
+    // api.getKpi('usd-locked')
+    // .then( res => {
+    //   this.getUsdLockedData(res)
+    //   this.loadingUsdLockedData = false
+    // });
 
-    this.loadingVolumesByDay = true
-    api.getKpi('volumes-by-day')
-    .then( res => {
-      this.getVolumesByDay(res)
-      this.loadingVolumesByDay = false
-    });
+    // this.loadingVolumesByDay = true
+    // api.getKpi('volumes-by-day')
+    // .then( res => {
+    //   this.getVolumesByDay(res)
+    //   this.loadingVolumesByDay = false
+    // });
 
     if (!this.chartDataLastUpdate ||  ( (Math.abs(Date.now() - this.chartDataLastUpdate) / 36e5) > 12 ) ) {
       console.log('get history all')
@@ -541,6 +597,23 @@ export default {
       return groupedResults
 
     },
+
+    usersByWeek(array){
+      let arrayByWeek = _(array)
+      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('isoWeek') )
+      .map((objs, key) => ({
+        'date': this.$moment(key).format('MM/DD/YY'),
+          'users': objs.map ( obj => {
+            return obj.address
+          })
+        }))
+      .value()
+
+      return arrayByWeek
+    }
+
+
+
     
 
 

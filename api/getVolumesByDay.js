@@ -22,7 +22,6 @@ export const run = async (tokens) => {
 
         return Promise.all(
             tokens.slice().map(async(token, i) => {
-
                 
                 let otokenAddress = await token._address; // oToken address
                 let otokenName = await token.methods.name().call(); // oToken name
@@ -42,7 +41,7 @@ export const run = async (tokens) => {
 
                 
                 // get past transactions from Firebase
-                const getTokensSoldFromDb = db.collection('tokensSold');
+                const getTokensSoldFromDb = db.collection('tokensSoldWithAddress');
                 const tokensSold = await getTokensSoldFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -51,7 +50,7 @@ export const run = async (tokens) => {
                         });
                         return tokensArray
                 })
-                const getTokensBoughtFromDb = db.collection('tokensBought');
+                const getTokensBoughtFromDb = db.collection('tokensBoughtWithAddress');
                 const tokensBought = await getTokensBoughtFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -88,6 +87,8 @@ export const run = async (tokens) => {
                         if (tokensSold.filter(transaction => transaction.transactionHash === soldEvents[i].transactionHash ).length === 0 ) {
 
                             let timestamp = await utils.getDateFromBlock(soldEvents[i].blockNumber)
+                            
+                            web3.eth.accounts.recoverTransaction
 
                             var date = moment.unix(timestamp).format("MM/DD/YY");
 
@@ -95,13 +96,16 @@ export const run = async (tokens) => {
                             let block = parseInt(soldEvents[i].blockNumber)
                             let transactionHash = soldEvents[i].transactionHash
                             
+                            let address = await utils.getAddressFromTransaction(transactionHash)
+
+                            
                             // get price from Coingecko
                             let assetPrice = await utils.getTokenPrice(historicalPrices, tokenAddress, date)
 
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensSold")
+                            await db.collection("tokensSoldWithAddress")
                                 .doc(soldEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -110,7 +114,8 @@ export const run = async (tokens) => {
                                     block: block,
                                     transactionHash: transactionHash,
                                     assetPrice: assetPrice,
-                                    total: total
+                                    total: total,
+                                    address: address
                                 })
 
                         }
@@ -119,7 +124,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensSoldFromDb = db.collection('tokensSold');
+                    const getUpdatedTokensSoldFromDb = db.collection('tokensSoldWithAddress');
                     const filteredSoldTokensByOtoken = await getUpdatedTokensSoldFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
@@ -173,6 +178,7 @@ export const run = async (tokens) => {
                             let tokensAmount = parseInt(boughtEvents[i].returnValues.tokens_bought)
                             let block = parseInt(boughtEvents[i].blockNumber)
                             let transactionHash = boughtEvents[i].transactionHash
+                            let address = await utils.getAddressFromTransaction(transactionHash)
 
                             // get price from Coingecko
                             let assetPrice = await utils.getTokenPrice(historicalPrices, tokenAddress, date)
@@ -180,7 +186,7 @@ export const run = async (tokens) => {
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensBought")
+                            await db.collection("tokensBoughtWithAddress")
                                 .doc(boughtEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -189,7 +195,8 @@ export const run = async (tokens) => {
                                     block: block,
                                     transactionHash: transactionHash,
                                     assetPrice: assetPrice,
-                                    total: total
+                                    total: total,
+                                    address: address
                                 })
 
                         }
@@ -198,7 +205,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBought');
+                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBoughtWithAddress');
                     const filteredBoughtTokensByOtoken = await getUpdatedTokensBoughtFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
@@ -232,9 +239,7 @@ export const run = async (tokens) => {
 
                     console.log(otokenName, 'totalBoughtByDate', totalBoughtByDate)
 
-
-
-                    volumesArray.push({ name: otokenName, id: id, totalSoldByDate: totalSoldByDate, totalBoughtByDate: totalBoughtByDate })
+                    volumesArray.push({ name: otokenName, id: id, totalSoldByDate: totalSoldByDate, totalBoughtByDate: totalBoughtByDate, rawTotalSold: filteredSoldTokensByOtoken, rawTotalBought: filteredBoughtTokensByOtoken })
 
                 }
 
