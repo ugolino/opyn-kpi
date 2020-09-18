@@ -54,6 +54,12 @@ exports.getDateFromBlock = async (blockNumber) => {
     return block.timestamp
 }
 
+// get date from block
+exports.getAddressFromTransaction = async (transactionHash) => {
+    let transaction = await web3.eth.getTransaction(transactionHash)
+    return transaction.from
+}
+
 // Import ABIs
 exports.oTokenAbi = require('../ABI/oToken.json');
 exports.cDaiAbi = require('../ABI/cDai.json');
