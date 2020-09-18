@@ -497,26 +497,26 @@ export default {
     this.endDate = this.$moment().format('YYYY-MM-DD');
     this.updateStartDate();
 
-    // this.loadingInsuranceCoverageData = true
-    // api.getKpi('insurance-coverage')
-    // .then( res => {
-    //   this.getInsuranceCoverageData(res)
-    //   this.loadingInsuranceCoverageData = false
-    // });
+    this.loadingInsuranceCoverageData = true
+    api.getKpi('insurance-coverage')
+    .then( res => {
+      this.getInsuranceCoverageData(res)
+      this.loadingInsuranceCoverageData = false
+    });
 
-    // this.loadingUsdLockedData = true
-    // api.getKpi('usd-locked')
-    // .then( res => {
-    //   this.getUsdLockedData(res)
-    //   this.loadingUsdLockedData = false
-    // });
+    this.loadingUsdLockedData = true
+    api.getKpi('usd-locked')
+    .then( res => {
+      this.getUsdLockedData(res)
+      this.loadingUsdLockedData = false
+    });
 
-    // this.loadingVolumesByDay = true
-    // api.getKpi('volumes-by-day')
-    // .then( res => {
-    //   this.getVolumesByDay(res)
-    //   this.loadingVolumesByDay = false
-    // });
+    this.loadingVolumesByDay = true
+    api.getKpi('volumes-by-day')
+    .then( res => {
+      this.getVolumesByDay(res)
+      this.loadingVolumesByDay = false
+    });
 
     if (!this.chartDataLastUpdate ||  ( (Math.abs(Date.now() - this.chartDataLastUpdate) / 36e5) > 12 ) ) {
       console.log('get history all')
