@@ -87,8 +87,6 @@ export const run = async (tokens) => {
                         if (tokensSold.filter(transaction => transaction.transactionHash === soldEvents[i].transactionHash ).length === 0 ) {
 
                             let timestamp = await utils.getDateFromBlock(soldEvents[i].blockNumber)
-                            
-                            web3.eth.accounts.recoverTransaction
 
                             var date = moment.unix(timestamp).format("MM/DD/YY");
 
