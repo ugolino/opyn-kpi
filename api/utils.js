@@ -63,6 +63,7 @@ exports.CurvefiSwapAbi = require('../ABI/CurvefiSwap.json');
 exports.OptionsExchangeAbi = require('../ABI/OptionsExchange.json');
 exports.OptionsFactoryAbi = require('../ABI/OptionsFactory.json');
 exports.OptionsContractAbi = require('../ABI/OptionsContract.json')
+exports.AcoFactoryAbi = require('../ABI/aco.abi.json');
 exports.UniswapFactoryAbi = require('../ABI/UniswapFactory.json')
 exports.UniswapExchangeAbi = require('../ABI/UniswapExchange.json')
 

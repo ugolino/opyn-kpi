@@ -17,6 +17,8 @@ async function runKpi() {
   let oTokens = [];
   let oethTokens = [];
 
+  let acoTokens = [];
+
   // get factory instance
   let factoryInstance1 = await utils.initContract(utils.OptionsFactoryAbi, registry.factory[0]);  // ocDai,ocUsdc,Ocrv factory
   let factoryInstance2 = await utils.initContract(utils.OptionsFactoryAbi, registry.factory[1]);  // oEth factory
@@ -25,20 +27,36 @@ async function runKpi() {
   let oTokenCounter = await factoryInstance1.methods.getNumberOfOptionsContracts().call();    // ocDai,ocUsdc,oCrv
   let oethTokensCounter = await factoryInstance2.methods.getNumberOfOptionsContracts().call();    // oEth 
 
-  // get tokens instances
-  for (let i = 0; i < oTokenCounter; i++) {
-    oTokens.push(
+  // get factory instance aco
+  let factoryInstanceAco = await utils.initContract(utils.AcoFactoryAbi, registry.acoFactory[0]);  // aco factory
+
+  // get number of Tokens aco
+  let acoTokensCounter = await factoryInstanceAco.methods.getNumberOfOptionsContracts().call();    // acoToken 
+
+  // // get tokens instances
+  // for (let i = 0; i < oTokenCounter; i++) {
+  //   oTokens.push(
+  //     await utils.initContract(
+  //       utils.OptionsContractAbi,
+  //       await factoryInstance1.methods.optionsContracts(i).call()
+  //     )
+  //   );
+  // }
+  // for (let i = 0; i < oethTokensCounter; i++) {
+  //   oethTokens.push(
+  //     await utils.initContract(
+  //       utils.OptionsContractAbi,
+  //       await factoryInstance2.methods.optionsContracts(i).call()
+  //     )
+  //   );
+  // }
+  // get aco tokens instances
+
+  for (let i = 0; i < acoTokensCounter; i++) {
+    acoTokens.push(
       await utils.initContract(
-        utils.OptionsContractAbi,
-        await factoryInstance1.methods.optionsContracts(i).call()
-      )
-    );
-  }
-  for (let i = 0; i < oethTokensCounter; i++) {
-    oethTokens.push(
-      await utils.initContract(
-        utils.OptionsContractAbi,
-        await factoryInstance2.methods.optionsContracts(i).call()
+        utils.AcoContractAbi,
+        await factoryInstanceAco.methods.optionsContracts(i).call()
       )
     );
   }

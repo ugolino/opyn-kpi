@@ -4,6 +4,10 @@ module.exports = {
         "0xcC5d905b9c2c8C9329Eb4e25dc086369D6C7777C"  // oEth factory
     ],
 
+    acoFactory: [
+        "0x176b98ab38d1aE8fF3F30bF07f9B93E26F559C17"  // oEth factory
+    ],
+
     uniswapFactory : "0xc0a47dfe034b400b47bdad5fecda2621de6c4d95",    // uniswap factory address
     
     yDai : "0xdF5e0e81Dff6FAF3A7e52BA697820c5e32D806A8",
@@ -21,6 +25,7 @@ module.exports = {
     balAddress: '0xba100000625a3754423978a60c9317c58a424e3d',
     yfiAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
     crvAddress: '0xd533a949740bb3306d119cc777fa900ba034cd52',
+    uniAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
 
     tokens: [
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //wethAddress, 
@@ -28,6 +33,7 @@ module.exports = {
         '0xba100000625a3754423978a60c9317c58a424e3d', //balAddress, 
         '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //yfiAddress, 
         '0xd533a949740bb3306d119cc777fa900ba034cd52', //crvAddress 
+        '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', //uniAddress 
     ],
 
 

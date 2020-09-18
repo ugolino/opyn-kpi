@@ -314,7 +314,7 @@ export default {
         )
       )
       let arrayTotVolumesByDay = this.groupAndSum(totalVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
-      let startDate = this.$moment(arrayTotVolumesByDay[0].date).format('MM/DD/YY')
+      let startDate = arrayTotVolumesByDay[0] ? this.$moment(arrayTotVolumesByDay[0].date).format('MM/DD/YY') : this.$moment('2020-02-01').format('MM/DD/YY')
       let endDate = this.$moment().format('MM/DD/YY')
      
       let dateArray = this.getDates(startDate, endDate)
