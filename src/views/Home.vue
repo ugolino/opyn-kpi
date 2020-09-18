@@ -443,21 +443,27 @@ export default {
 
     totSoldUsers(){
       let allTransactions = []
-      this.volumesByDay.map( item => {
-        item.rawTotalSold.map ( transaction =>{
-          allTransactions.push(transaction)
+      if (this.volumesByDay) {
+        this.volumesByDay.map( item => {
+          item.rawTotalSold.map ( transaction =>{
+            allTransactions.push(transaction)
+          })
         })
-      })
+      }
+
+
       return allTransactions
     },
 
     totBoughtUsers(){
       let allTransactions = []
-      this.volumesByDay.map( item => {
-        item.rawTotalBought.map ( transaction =>{
-          allTransactions.push(transaction)
+      if (this.volumesByDay) {
+        this.volumesByDay.map( item => {
+          item.rawTotalBought.map ( transaction =>{
+            allTransactions.push(transaction)
+          })
         })
-      })
+      }
       return allTransactions
     },
 
