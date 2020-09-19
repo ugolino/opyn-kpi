@@ -21,7 +21,8 @@ export const run = async (tokens) => {
     const getData = async () => {
 
         return Promise.all(
-            tokens.slice().map(async(token, i) => {
+            tokens.slice( ).map(async(token, i) => {
+
                 
                 let otokenAddress = await token._address; // oToken address
                 let otokenName = await token.methods.name().call(); // oToken name
@@ -87,7 +88,7 @@ export const run = async (tokens) => {
                         if (tokensSold.filter(transaction => transaction.transactionHash === soldEvents[i].transactionHash ).length === 0 ) {
 
                             let timestamp = await utils.getDateFromBlock(soldEvents[i].blockNumber)
-
+                            
                             var date = moment.unix(timestamp).format("MM/DD/YY");
 
                             let tokensAmount = parseInt(soldEvents[i].returnValues.tokens_sold)

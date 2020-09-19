@@ -1,95 +1,11 @@
 <template>
   <div class="columns is-multiline my-4 ">
 
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Daily Volumes</p>
-          <radar-spinner
-            v-if="loadingVolumesByDay"
-            :size="20"
-            class="my-4 mb-4"
-          />
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              today 
-              <h3 class="title">
-                {{ todayVolume | numeral('$0.0a') }}
-                <span class="subtitle" v-if="todayVolume != '-' && yesterdayVolume != '-'">
-                  {{ (((  todayVolume / yesterdayVolume ) - 1)) | numeral('+0%') }}
-                </span>
-              </h3>
-            </div>
-            <div class="column">
-              yesterday 
-              <h3 class="title">{{ yesterdayVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <recapCard title="Daily Volumes" :currentValue="todayVolume" :previousValue="yesterdayVolume" :loading="loadingVolumesByDay ? true : false" />
 
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Weekly Volumes</p>
-          <radar-spinner
-            v-if="loadingVolumesByDay"
-            :size="20"
-            class="my-4 mb-4"
-          />
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              current week 
-              <h3 class="title">
-                {{ currentWeekVolume | numeral('$0.0a') }}
-                <span class="subtitle" v-if="currentWeekVolume != '-' && previousWeekVolume != '-'">
-                  {{ (((  currentWeekVolume / previousWeekVolume ) - 1)) | numeral('+0%') }}
-                </span>
-              </h3>
-            </div>
-            <div class="column">
-              previuos week 
-              <h3 class="title">{{ previousWeekVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="column">
-      <div class="card has-text-centered">
-        <header class="card-header">
-          <p class="card-header-title">Monthly Volumes</p>
-          <radar-spinner
-            v-if="loadingVolumesByDay"
-            :size="20"
-            class="my-4 mb-4"
-          />
-        </header>
-        <div class="card-content">
-          <div class="columns">
-            <div class="column">
-              current month 
-              <h3 class="title">
-                {{ currentMonthVolume | numeral('$0.0a') }}
-                <span class="subtitle" v-if="currentMonthVolume != '-' && previousMonthVolume != '-'">
-                  {{ (((  currentMonthVolume / previousMonthVolume ) - 1)) | numeral('+0%') }}
-                </span>
-              </h3>
-            </div>
-            <div class="column">
-              previuos month 
-              <h3 class="title">{{ previousMonthVolume | numeral('$0.0a') }}</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <recapCard title="Weekly Volumes" :currentValue="currentWeekVolume" :previousValue="previousWeekVolume" :loading="loadingVolumesByDay ? true : false" />
+    
+    <recapCard title="Monthly Volumes" :currentValue="currentMonthVolume" :previousValue="previousMonthVolume" :loading="loadingVolumesByDay ? true : false" />
 
     <div class="column is-full">
       <div class="card has-text-centered">
@@ -201,69 +117,78 @@
     <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
-          <p class="card-header-title">Weekly Users</p>
+          <p class="card-header-title">Total Users</p>
         </header>
         <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              <div class="buttons my-4">
+                <b-button @click="SelectedTimeframeForChartDataForUser = 'total'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'weekly'}" type="is-primary">
+                  Weekly
+                </b-button>
+                <b-button @click="SelectedTimeframeForChartDataForUser = 'totalSold'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'monthly'}" type="is-primary">
+                  Monthly
+                </b-button>
+              </div>
+            </div>
+          </div>
           <column-chart :stacked="true" :data="chartDataForUser" thousands="," :colors="['#1abc9c', '#94849B']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
 
+    <div class="column is-half">
+      <card v-if="insuranceCoverage.length > 0" :dataArray="insuranceCoverage" title="Insurance Coverage" :lastUpdate="insuranceCoverageLastUpdate" :isLoading="loadingInsuranceCoverageData" />
+      <radar-spinner
+        v-else
+        :size="80"
+        class="my-4 mb-4"
+      />
+    </div>
+    <div class="column is-half">
+      <card v-if="usdLocked.length > 0" :dataArray="usdLocked" title="USD Locked" :lastUpdate="usdLockedLastUpdate" :isLoading="loadingUsdLockedData" />
+      <radar-spinner
+        v-else
+        :size="80"
+        class="my-4 mb-4"
+      />
+    </div>
 
-
-
-      <div class="column is-half">
-        <card v-if="insuranceCoverage.length > 0" :dataArray="insuranceCoverage" title="Insurance Coverage" :lastUpdate="insuranceCoverageLastUpdate" :isLoading="loadingInsuranceCoverageData" />
-        <radar-spinner
-          v-else
-          :size="80"
-          class="my-4 mb-4"
-        />
-      </div>
-      <div class="column is-half">
-        <card v-if="usdLocked.length > 0" :dataArray="usdLocked" title="USD Locked" :lastUpdate="usdLockedLastUpdate" :isLoading="loadingUsdLockedData" />
-        <radar-spinner
-          v-else
-          :size="80"
-          class="my-4 mb-4"
-        />
-      </div>
-
-      <div class="column is-full">
-        <div class="columns">
-          <div class="column">
-            <b-button type="is-primary"
-              v-for="(item, index) in chartDataTypes" 
-              :key="index"
-              @click="selectedChartDataType = item"
-              :class="[{'is-outlined' : selectedChartDataType != item }, 'mx-4' ]"
-              >
-                {{item}}
-            </b-button>
-          </div>
-          
-          <div class="column  has-text-right">
-            <b-button type="is-primary"
-              v-for="(item, index) in timeFrames" 
-              :key="index"
-              @click="selectedTimeFrame = item, updateStartDate(), getChartData()"
-              :class="[{'is-outlined' : selectedTimeFrame != item }, 'mx-4']"
-              >
-                {{ item }} days
-            </b-button>
-          </div>
+    <div class="column is-full">
+      <div class="columns">
+        <div class="column">
+          <b-button type="is-primary"
+            v-for="(item, index) in chartDataTypes" 
+            :key="index"
+            @click="selectedChartDataType = item"
+            :class="[{'is-outlined' : selectedChartDataType != item }, 'mx-4' ]"
+            >
+              {{item}}
+          </b-button>
         </div>
-
-        <p v-if="chartDataLastUpdate" class="is-small has-text-right">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }} (DefiPulse)</p>
-
-        <column-chart v-if="chartDataByType.length > 0" :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
-
-        <radar-spinner
-          v-else
-          :size="80"
-          class="my-4 mb-4"
-        />
+        
+        <div class="column  has-text-right">
+          <b-button type="is-primary"
+            v-for="(item, index) in timeFrames" 
+            :key="index"
+            @click="selectedTimeFrame = item, updateStartDate(), getChartData()"
+            :class="[{'is-outlined' : selectedTimeFrame != item }, 'mx-4']"
+            >
+              {{ item }} days
+          </b-button>
+        </div>
       </div>
+
+      <p v-if="chartDataLastUpdate" class="is-small has-text-right">last updated: {{ chartDataLastUpdate - Date.now() | duration('humanize', true) }} (DefiPulse)</p>
+
+      <column-chart v-if="chartDataByType.length > 0" :data="chartDataByType" thousands="," :colors="['#1abc9c']" :round="0" ></column-chart>
+
+      <radar-spinner
+        v-else
+        :size="80"
+        class="my-4 mb-4"
+      />
+    </div>
 
   </div>
 </template>
@@ -272,12 +197,14 @@
 import { mapState, mapActions } from 'vuex'
 import api from '../../api'
 import card from '../components/card'
+import recapCard from '../components/recapCard'
 import {RadarSpinner} from 'epic-spinners'
 
 export default {
   components: {
     card,
-    RadarSpinner
+    RadarSpinner,
+    recapCard
   },
   data() {
     return {
@@ -296,7 +223,8 @@ export default {
       showMoreOptions: false,
       selectedOptionForChart: null,
       selectedTypeForChart: 'totalSold',
-      selectedTimeFrameForVolumeChart: 'daily'
+      selectedTimeFrameForVolumeChart: 'daily',
+      SelectedTimeframeForChartDataForUser: 'weekly'
     }
   },
   computed: {
@@ -423,22 +351,28 @@ export default {
     },
 
     todayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 1] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value : ''
+      let value = this.totalVolumesByDay[this.totalVolumesByDay.length - 1] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 1].value : null
+      return { label: "Today", value: value }
     },
     yesterdayVolume(){
-      return this.totalVolumesByDay[this.totalVolumesByDay.length - 2] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value : '-'
+      let value = this.totalVolumesByDay[this.totalVolumesByDay.length - 2] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value : null
+      return { label: "Yesterday", value: value }
     },
     currentWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 1] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value : '-'
+      let value = this.totVolumesByWeek[this.totVolumesByWeek.length - 1] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value : null
+      return { label: "Current Week", value: value }
     },
     previousWeekVolume(){
-      return this.totVolumesByWeek[this.totVolumesByWeek.length - 2] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value : '-'
+      let value = this.totVolumesByWeek[this.totVolumesByWeek.length - 2] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 2].value : null
+      return { label: "Previous Week", value: value }
     },
     currentMonthVolume(){
-      return this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ].value : '-'
+      let value = this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 1 ].value : null
+      return { label: "Current Month", value: value }
     },
     previousMonthVolume(){
-      return this.totVolumesByMonth[this.totVolumesByMonth.length - 2] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 2].value : '-'
+      let value = this.totVolumesByMonth[this.totVolumesByMonth.length - 2] ? this.totVolumesByMonth[this.totVolumesByMonth.length - 2].value : null
+      return { label: "Previous Month", value: value }
     },
 
     totSoldUsers(){
@@ -469,12 +403,26 @@ export default {
 
     chartDataForUser(){
 
-      let totSold = this.usersByWeek(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
-        item => Object.values({ date: item.date, value: new Set(item.users).size }) 
-      )
-      let totBought = this.usersByWeek(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
-        item => Object.values({ date: item.date, value: new Set(item.users).size }) 
-      )
+      let totSold = []
+      let totBought = []
+
+      if (this.SelectedTimeframeForChartDataForUser === "weekly") {
+        totSold = this.usersByWeek(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+        )
+        totBought = this.usersByWeek(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+        )
+      } else {
+        totSold = this.usersByMonth(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+        )
+        totBought = this.usersByMonth(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: new Set(item.users).size }) 
+        )       
+      }
+
+
 
 
       return [
@@ -616,12 +564,21 @@ export default {
       .value()
 
       return arrayByWeek
+    },
+
+    usersByMonth(array){
+      let arrayByMonth = _(array)
+      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('month') )
+      .map((objs, key) => ({
+        'date': this.$moment(key).format('MMM YY'),
+          'users': objs.map ( obj => {
+            return obj.address
+          })
+        }))
+      .value()
+
+      return arrayByMonth
     }
-
-
-
-    
-
 
   }
 }
