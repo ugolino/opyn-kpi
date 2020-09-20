@@ -22,7 +22,7 @@
             </h3>
           </div>
           <div class="column">
-            yesterday 
+            {{ previousValue.label }} 
             <h3 class="title">
               {{ previousValue.value | numeral('$0.0a')  }}
             </h3>
