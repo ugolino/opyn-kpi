@@ -32,13 +32,13 @@ export const run = async (tokens) => {
                 let otokenStrikePrice = await token.methods.strikePrice().call();  // oToken strike price
 
                 // check if call
-                let isCall = ((otokenStrikeAdd.toLowerCase() == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)) ?
+                let isCall = ( otokenUnderlyingAdd == registry.usdcAddress ) ?
                     true :
                     false
                 // if call use multiplier
                 let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000)) : false
-                // if call token is eth
-                let tokenAddress = isCall ? ADDRESS_ZERO : otokenUnderlyingAdd.toLowerCase()
+            
+                let tokenAddress = isCall ? otokenStrikeAdd : otokenUnderlyingAdd.toLowerCase()
 
                 
                 // get past transactions from Firebase
@@ -73,7 +73,8 @@ export const run = async (tokens) => {
                 // filter only options for eth, tokens and calls
                 if (otokenUnderlyingAdd == ADDRESS_ZERO ||
                     registry.tokens.includes(otokenUnderlyingAdd.toLowerCase()) ||
-                    (otokenStrikeAdd == ADDRESS_ZERO) && (otokenUnderlyingAdd == registry.usdcAddress)
+                    registry.tokens.includes(otokenStrikeAdd.toLowerCase()) ||
+                    otokenUnderlyingAdd == registry.usdcAddress
                 ) {
                     let id = i + 1
 
