@@ -143,10 +143,18 @@ getTokenPutInsuranceDollar = async (oToken, name, decimals, oTokenExchangeAdd, a
 
 
 getTokenPriceCoingecko = async (token) => {
-    const res = await fetch(
-        `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${token}&vs_currencies=usd`,
-    )
-    const price = (await res.json())[token.toLowerCase()].usd
+    let price = 0
+    if (token === ADDRESS_ZERO ) {
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd`,
+        )
+        price = (await res.json())['ethereum'].usd      
+    } else {
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${token}&vs_currencies=usd`,
+        )
+        price = (await res.json())[token.toLowerCase()].usd
+    }
     return price
 }
 
@@ -171,8 +179,9 @@ exports.run = async (otokens) => {
     // yToken exchange rate
     const yTokenToUsd = await curvefiSwapInstance.methods.get_virtual_price().call() / 1e18;
     // ETH/USD price
-    const ethToUsd = await utils.getMakerEthUsd(makerMedianizerInstance);
+    // const ethToUsd = await utils.getMakerEthUsd(makerMedianizerInstance);
 
+    const ethToUsd = await getTokenPriceCoingecko(ADDRESS_ZERO)
 
 
     let oTokensInsuranceBoughtDollar = [];
@@ -298,6 +307,10 @@ exports.run = async (otokens) => {
         value: calculateInsuranceInDollar(oTokensInsuranceBoughtDollar),
         currency: "USD"
     })
+
+    console.log('we here')
+
+    console.log(coverageInsuranceArray)
 
     return coverageInsuranceArray
     

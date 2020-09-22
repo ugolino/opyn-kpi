@@ -42,7 +42,7 @@ export const run = async (tokens) => {
 
                 
                 // get past transactions from Firebase
-                const getTokensSoldFromDb = db.collection('tokensSoldWithAddress');
+                const getTokensSoldFromDb = db.collection('tokensSold');
                 const tokensSold = await getTokensSoldFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -51,7 +51,7 @@ export const run = async (tokens) => {
                         });
                         return tokensArray
                 })
-                const getTokensBoughtFromDb = db.collection('tokensBoughtWithAddress');
+                const getTokensBoughtFromDb = db.collection('tokensBought');
                 const tokensBought = await getTokensBoughtFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -105,7 +105,7 @@ export const run = async (tokens) => {
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensSoldWithAddress")
+                            await db.collection("tokensSold")
                                 .doc(soldEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -124,7 +124,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensSoldFromDb = db.collection('tokensSoldWithAddress');
+                    const getUpdatedTokensSoldFromDb = db.collection('tokensSold');
                     const filteredSoldTokensByOtoken = await getUpdatedTokensSoldFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
@@ -186,7 +186,7 @@ export const run = async (tokens) => {
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensBoughtWithAddress")
+                            await db.collection("tokensBought")
                                 .doc(boughtEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -205,7 +205,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBoughtWithAddress');
+                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBought');
                     const filteredBoughtTokensByOtoken = await getUpdatedTokensBoughtFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []

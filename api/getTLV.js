@@ -2,6 +2,8 @@
 const utils = require('./utils');
 const registry = require('./registry');
 
+const ADDRESS_ZERO = 0x0000000000000000000000000000000000000000;
+
 let tokensLockedArray = []
 
 exports.getTokenLocked = async (t, otokens) => {
@@ -61,8 +63,10 @@ exports.getTotalDollarLocked = async (oTokensAddresses) => {
     // get ETH locked in $
     let totalEthLocked = await exports.getEthLocked(oTokensAddresses);
     let makerMedianizer = await utils.initContract(utils.MakerMedianizerAbi, registry.makerMedianizerAddress);
-    let ethToUsd = await utils.getMakerEthUsd(makerMedianizer);
+    // let ethToUsd = await utils.getMakerEthUsd(makerMedianizer);
+    let ethToUsd = await getTokenPriceCoingecko(ADDRESS_ZERO)
     let totalEthLockedDollar = totalEthLocked * ethToUsd / 1e18;
+
 
 
 
@@ -87,6 +91,9 @@ exports.getTotalDollarLocked = async (oTokensAddresses) => {
         value: totalLockedDollar,
         currency: "USD"
     })
+
+    console.log('getTotalDollarLocked')
+    console.log(tokensLockedArray)
 
     return tokensLockedArray
 }
@@ -126,3 +133,19 @@ exports.getEthLocked = async(otokens) => {
     return totalEthLocked;
 }
 
+
+getTokenPriceCoingecko = async (token) => {
+    let price = 0
+    if (token === ADDRESS_ZERO) {
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd`,
+        )
+        price = (await res.json())['ethereum'].usd
+    } else {
+        const res = await fetch(
+            `https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${token}&vs_currencies=usd`,
+        )
+        price = (await res.json())[token.toLowerCase()].usd
+    }
+    return price
+}
