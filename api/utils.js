@@ -90,7 +90,7 @@ exports.getTokenPrice = async (historicalPrices, address, date) => {
             return obj;
         }, {})
 
-    return Object.values(price)[0]
+    return Object.values(price)[0] ? Object.values(price)[0] : 0
 
 }
 
