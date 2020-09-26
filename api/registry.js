@@ -22,6 +22,7 @@ module.exports = {
     yfiAddress: '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e',
     crvAddress: '0xd533a949740bb3306d119cc777fa900ba034cd52',
     uniAddress: '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984',
+    snxAddress: '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f',
 
     tokens: [
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', //wethAddress, 
@@ -30,6 +31,7 @@ module.exports = {
         '0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e', //yfiAddress, 
         '0xd533a949740bb3306d119cc777fa900ba034cd52', //crvAddress 
         '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984', //uniAddress 
+        '0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f' //snxAddress 
     ],
 
 
