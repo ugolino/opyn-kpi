@@ -255,8 +255,8 @@ export default {
         )
       )
       let arrayTotVolumesByDay = this.groupAndSum(totalVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
-      let startDate = arrayTotVolumesByDay[0] ? this.$moment(arrayTotVolumesByDay[0].date).format('MM/DD/YY') : this.$moment('2020-02-01').format('MM/DD/YY')
-      let endDate = this.$moment().format('MM/DD/YY')
+      let startDate = arrayTotVolumesByDay[0] ? this.$moment.utc(arrayTotVolumesByDay[0].date).format('MM/DD/YY') : this.$moment.utc('2020-02-01').format('MM/DD/YY')
+      let endDate = this.$moment.utc().format('MM/DD/YY')
      
       let dateArray = this.getDates(startDate, endDate)
 
@@ -318,17 +318,17 @@ export default {
         this.selectedOptionForChart.totalSoldByDate.map ( totalSold => totals.push(totalSold))
 
         let sortedTotals = totals.sort((a, b) => new Date(a.date) - new Date(b.date))
-        let startDate = this.$moment(sortedTotals[0].date).format('MM/DD/YY')
-        let endDate = this.$moment(sortedTotals[sortedTotals.length - 1].date).format('MM/DD/YY')
+        let startDate = this.$moment.utc(sortedTotals[0].date).format('MM/DD/YY')
+        let endDate = this.$moment.utc(sortedTotals[sortedTotals.length - 1].date).format('MM/DD/YY')
 
         let dateArray = this.getDates(startDate, endDate)
 
         let chartArray = []
 
         if (this.selectedTypeForChart === 'total') {
-            let groupedArray = _(totals).groupBy( item => this.$moment(item.date, 'MM/DD/YY') )
+            let groupedArray = _(totals).groupBy( item => this.$moment.utc(item.date, 'MM/DD/YY') )
             .map((objs, key) => ({
-              'date': this.$moment(key).format('MM/DD/YY'),
+              'date': this.$moment.utc(key).format('MM/DD/YY'),
               'total': _.sumBy(objs, 'total') }))
             .value()
             chartArray = groupedArray
@@ -442,7 +442,7 @@ export default {
 
   },
   mounted() {
-    this.endDate = this.$moment().format('YYYY-MM-DD');
+    this.endDate = this.$moment.utc().format('YYYY-MM-DD');
     this.updateStartDate();
 
     this.loadingInsuranceCoverageData = true
@@ -488,7 +488,7 @@ export default {
     }),
     updateStartDate(){
       let dateOffset = (24*60*60*1000) * this.selectedTimeFrame;
-      this.startDate = this.$moment( new Date - dateOffset ).format('YYYY-MM-DD')
+      this.startDate = this.$moment.utc( new Date - dateOffset ).format('YYYY-MM-DD')
     },
     // getChartData(){
     //   api.getKpi('history-all')
@@ -518,20 +518,20 @@ export default {
 
     getDates(startDate, endDate) {
       var dateArray = [];
-      var currentDate = this.$moment(startDate);
-      var endDate = this.$moment(endDate);
+      var currentDate = this.$moment.utc(startDate);
+      var endDate = this.$moment.utc(endDate);
       while (currentDate <= endDate) {
-          dateArray.push( this.$moment(currentDate).format('MM/DD/YY') )
-          currentDate = this.$moment(currentDate).add(1, 'days');
+          dateArray.push( this.$moment.utc(currentDate).format('MM/DD/YY') )
+          currentDate = this.$moment.utc(currentDate).add(1, 'days');
       }
       return dateArray;
     },
 
     groupAndSumByWeeks(array){
       let groupedResults = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('isoWeek') )
+      .groupBy( item => this.$moment.utc(item['date'], 'MM/DD/YY').startOf('isoWeek') )
       .map((objs, key) => ({
-        'date': this.$moment(key).format('MM/DD/YY'),
+        'date': this.$moment.utc(key).format('MM/DD/YY'),
         'value': _.sumBy(objs, 'value') }))
       .value()
 
@@ -542,9 +542,9 @@ export default {
     groupAndSumByMonths(array){
 
       let groupedResults = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('month') )
+      .groupBy( item => this.$moment.utc(item['date'], 'MM/DD/YY').startOf('month') )
       .map((objs, key) => ({
-        'date': this.$moment(key).format('MMM YY'),
+        'date': this.$moment.utc(key).format('MMM YY'),
         'value': _.sumBy(objs, 'value') }))
       .value()
 
@@ -554,9 +554,9 @@ export default {
 
     usersByWeek(array){
       let arrayByWeek = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('isoWeek') )
+      .groupBy( item => this.$moment.utc(item['date'], 'MM/DD/YY').startOf('isoWeek') )
       .map((objs, key) => ({
-        'date': this.$moment(key).format('MM/DD/YY'),
+        'date': this.$moment.utc(key).format('MM/DD/YY'),
           'users': objs.map ( obj => {
             return obj.address
           })
@@ -568,9 +568,9 @@ export default {
 
     usersByMonth(array){
       let arrayByMonth = _(array)
-      .groupBy( item => this.$moment(item['date'], 'MM/DD/YY').startOf('month') )
+      .groupBy( item => this.$moment.utc(item['date'], 'MM/DD/YY').startOf('month') )
       .map((objs, key) => ({
-        'date': this.$moment(key).format('MMM YY'),
+        'date': this.$moment.utc(key).format('MMM YY'),
           'users': objs.map ( obj => {
             return obj.address
           })

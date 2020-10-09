@@ -92,13 +92,14 @@ getOethPutInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, 
     return insuranceBoughtDollar;
 }
 
-getOethCallInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, add2, ethToUsd, otokenStrikePrice) => {
+getOethCallInsuranceDollar = async (oEth, name, decimals, oEthExchangeAdd, add1, add2, ethToUsd, otokenStrikePrice, otokenDecimals) => {
     let oEthTotalSupply = await utils.getTotalSupply(oEth) / 10**decimals;
     let oEthUniswapBalance = await utils.getBalance(oEth, oEthExchangeAdd) / 10**decimals;
     let oEthBalance1 = await utils.getBalance(oEth, add1) / 10**decimals;
     let oEthBalance2 = await utils.getBalance(oEth, add2) / 10**decimals;
 
-    let oethToEth = 1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000 );
+
+    let oethToEth = (1 / otokenStrikePrice.value * (10 ** (-otokenStrikePrice.exponent - otokenDecimals)));
 
     let oEthBought = calculateInsuranceBought(oEthTotalSupply, oEthUniswapBalance, oEthBalance1, oEthBalance2);
     let insuranceBoughtDollar = (oEthBought * ethToUsd / 1e18) / oethToEth;
@@ -203,6 +204,7 @@ exports.run = async (otokens) => {
         let otokenUniswapExchangeAdd = await uniswapFactoryInstance.methods.getExchange(otokens[i]._address).call(); // oToken uniswap exchange address
 
 
+
         if(otokenUnderlyingAdd == ADDRESS_ZERO) {
             oTokensInsuranceBoughtDollar.push(
                 await getOethPutInsuranceDollar(
@@ -227,7 +229,8 @@ exports.run = async (otokens) => {
                     "0x9e68B67660c223B3E0634D851F5DF821E0E17D84",
                     "0x076C95c6cd2eb823aCC6347FdF5B3dd9b83511E4",
                     ethToUsd,
-                    otokenStrikePrice
+                    otokenStrikePrice,
+                    otokenDecimals
                 )
             );
         }
@@ -307,8 +310,6 @@ exports.run = async (otokens) => {
         value: calculateInsuranceInDollar(oTokensInsuranceBoughtDollar),
         currency: "USD"
     })
-
-    console.log('we here')
 
     console.log(coverageInsuranceArray)
 

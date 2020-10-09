@@ -21,7 +21,7 @@ export const run = async (tokens) => {
     const getData = async () => {
 
         return Promise.all(
-            tokens.slice( ).map(async(token, i) => {
+            tokens.slice(Math.max(tokens.length - 2, 1) ).map(async(token, i) => {
 
                 
                 let otokenAddress = await token._address; // oToken address
@@ -36,13 +36,15 @@ export const run = async (tokens) => {
                     true :
                     false
                 // if call use multiplier
-                let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000)) : false
-            
+                // let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (otokenStrikePrice.exponent === "-11" ? 100000 : 1000)) : false
+
+                let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (10 ** (-otokenStrikePrice.exponent - otokenDecimals) )) : false
+
                 let tokenAddress = isCall ? otokenStrikeAdd : otokenUnderlyingAdd.toLowerCase()
 
                 
                 // get past transactions from Firebase
-                const getTokensSoldFromDb = db.collection('tokensSold');
+                const getTokensSoldFromDb = db.collection('tokensSoldTest');
                 const tokensSold = await getTokensSoldFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -51,7 +53,7 @@ export const run = async (tokens) => {
                         });
                         return tokensArray
                 })
-                const getTokensBoughtFromDb = db.collection('tokensBought');
+                const getTokensBoughtFromDb = db.collection('tokensBoughtTest');
                 const tokensBought = await getTokensBoughtFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -105,7 +107,7 @@ export const run = async (tokens) => {
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensSold")
+                            await db.collection('tokensSoldTest')
                                 .doc(soldEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -124,7 +126,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensSoldFromDb = db.collection('tokensSold');
+                    const getUpdatedTokensSoldFromDb = db.collection('tokensSoldTest');
                     const filteredSoldTokensByOtoken = await getUpdatedTokensSoldFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
@@ -186,7 +188,7 @@ export const run = async (tokens) => {
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
                             // update Firebase DB with new transactions
-                            await db.collection("tokensBought")
+                            await db.collection('tokensBoughtTest')
                                 .doc(boughtEvents[i].transactionHash)
                                 .set({
                                     otokenAddress: otokenAddress,
@@ -205,7 +207,7 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBought');
+                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBoughtTest');
                     const filteredBoughtTokensByOtoken = await getUpdatedTokensBoughtFromDb.where("otokenAddress", "==", otokenAddress).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
