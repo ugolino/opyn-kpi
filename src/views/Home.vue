@@ -190,6 +190,24 @@
       />
     </div>
 
+    <div class="column is-full">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Oracle</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              Balance                
+              <h3 class="title" v-if="oracleEthBalance > 0">
+                {{ parseFloat(oracleEthBalance * 1e-18).toFixed(2) }} ETH
+            </h3>
+            </div>
+          </div>
+        </div>
+      </div> 
+    </div>
+
   </div>
 </template>
 
@@ -199,6 +217,7 @@ import api from '../../api'
 import card from '../components/card'
 import recapCard from '../components/recapCard'
 import {RadarSpinner} from 'epic-spinners'
+const utils = require('../../api/utils');
 
 export default {
   components: {
@@ -224,7 +243,8 @@ export default {
       selectedOptionForChart: null,
       selectedTypeForChart: 'totalSold',
       selectedTimeFrameForVolumeChart: 'daily',
-      SelectedTimeframeForChartDataForUser: 'weekly'
+      SelectedTimeframeForChartDataForUser: 'weekly',
+      oracleEthBalance: Number
     }
   },
   computed: {
@@ -441,9 +461,12 @@ export default {
 
 
   },
-  mounted() {
+
+  async mounted() {
     this.endDate = this.$moment.utc().format('YYYY-MM-DD');
     this.updateStartDate();
+
+    this.oracleEthBalance = await utils.getBalanceFromAddress('0xb815fdc4c3ea561bacddf6c693da525bda570fa2');
 
     this.loadingInsuranceCoverageData = true
     api.getKpi('insurance-coverage')

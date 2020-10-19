@@ -60,6 +60,15 @@ exports.getAddressFromTransaction = async (transactionHash) => {
     return transaction.from
 }
 
+// get balance
+exports.getBalanceFromAddress = async (address) => {
+    let balance = web3.eth.getBalance(address);
+    console.log(balance)
+    console.log(balance * 1e-18)
+    // balance = web3.toDecimal(balance);
+    return balance
+}
+
 // Import ABIs
 exports.oTokenAbi = require('../ABI/oToken.json');
 exports.cDaiAbi = require('../ABI/cDai.json');
