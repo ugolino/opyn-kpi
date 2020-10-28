@@ -468,19 +468,19 @@ export default {
 
     this.oracleEthBalance = await utils.getBalanceFromAddress('0xb815fdc4c3ea561bacddf6c693da525bda570fa2');
 
-    this.loadingInsuranceCoverageData = true
-    api.getKpi('insurance-coverage')
-    .then( res => {
-      this.getInsuranceCoverageData(res)
-      this.loadingInsuranceCoverageData = false
-    });
+    // this.loadingInsuranceCoverageData = true
+    // api.getKpi('insurance-coverage')
+    // .then( res => {
+    //   this.getInsuranceCoverageData(res)
+    //   this.loadingInsuranceCoverageData = false
+    // });
 
-    this.loadingUsdLockedData = true
-    api.getKpi('usd-locked')
-    .then( res => {
-      this.getUsdLockedData(res)
-      this.loadingUsdLockedData = false
-    });
+    // this.loadingUsdLockedData = true
+    // api.getKpi('usd-locked')
+    // .then( res => {
+    //   this.getUsdLockedData(res)
+    //   this.loadingUsdLockedData = false
+    // });
 
     this.loadingVolumesByDay = true
     api.getKpi('volumes-by-day')

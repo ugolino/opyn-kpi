@@ -98,8 +98,9 @@ exports.getTokenPrice = async (historicalPrices, address, date) => {
             obj[key] = pricesByAddress[key];
             return obj;
         }, {})
+    
+        return Object.values(price)[0] ? Object.values(price)[0] : 0
 
-    return Object.values(price)[0] ? Object.values(price)[0] : 0
 
 }
 
@@ -138,6 +139,7 @@ exports.getHistoricalPriceCoingecko = async (historicalPrices, address) => {
     // return price
     const prices = ((await res.json())['prices'])
 
+    
     let objectPrices = prices.reduce(function (p, c) {
         let date = moment.unix(c[0] / 1000).format("MM/DD/YY")
         p[date] = c[1];

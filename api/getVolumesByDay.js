@@ -24,7 +24,7 @@ export const run = async (tokens) => {
             tokens.slice().map(async(token, i) => {
 
                 
-                let otokenAddress = await token._address; // oToken address
+                let otokenAddress = await token._address.toLowerCase(); // oToken address
                 let otokenName = await token.methods.name().call(); // oToken name
                 let otokenDecimals = await token.methods.decimals().call();    // oToken decimals
                 let otokenUnderlyingAdd = await token.methods.underlying().call();    // oToken underlying token address
@@ -41,10 +41,9 @@ export const run = async (tokens) => {
                 let callMultiplier = isCall ? (1 / otokenStrikePrice.value * (10 ** (-otokenStrikePrice.exponent - otokenDecimals) )) : false
 
                 let tokenAddress = isCall ? otokenStrikeAdd : otokenUnderlyingAdd.toLowerCase()
-
                 
                 // get past transactions from Firebase
-                const getTokensSoldFromDb = db.collection('tokensSoldTest');
+                const getTokensSoldFromDb = db.collection('tokensSoldTransactions');
                 const tokensSold = await getTokensSoldFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -53,7 +52,7 @@ export const run = async (tokens) => {
                         });
                         return tokensArray
                 })
-                const getTokensBoughtFromDb = db.collection('tokensBoughtTest');
+                const getTokensBoughtFromDb = db.collection('tokensBoughtTransactions');
                 const tokensBought = await getTokensBoughtFromDb.get()
                     .then(function (querySnapshot) {
                         let tokensArray = []
@@ -106,19 +105,22 @@ export const run = async (tokens) => {
 
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
-                            // update Firebase DB with new transactions
-                            await db.collection('tokensSoldTest')
-                                .doc(soldEvents[i].transactionHash)
-                                .set({
-                                    otokenAddress: otokenAddress,
-                                    tokensAmount: tokensAmount,
-                                    date: date,
-                                    block: block,
-                                    transactionHash: transactionHash,
-                                    assetPrice: assetPrice,
-                                    total: total,
-                                    address: address
-                                })
+                            if (assetPrice != 0) {
+                                // update Firebase DB with new transactions
+                                await db.collection('tokensSoldTransactions')
+                                    .doc(soldEvents[i].transactionHash)
+                                    .set({
+                                        otokenAddress: otokenAddress.toLowerCase(),
+                                        tokensAmount: tokensAmount,
+                                        date: date,
+                                        block: block,
+                                        transactionHash: transactionHash,
+                                        assetPrice: assetPrice,
+                                        total: total,
+                                        address: address
+                                    })
+                            }
+
 
                         }
 
@@ -126,8 +128,8 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensSoldFromDb = db.collection('tokensSoldTest');
-                    const filteredSoldTokensByOtoken = await getUpdatedTokensSoldFromDb.where("otokenAddress", "==", otokenAddress).get()
+                    const getUpdatedTokensSoldFromDb = db.collection('tokensSoldTransactions');
+                    const filteredSoldTokensByOtoken = await getUpdatedTokensSoldFromDb.where("otokenAddress", "==", otokenAddress.toLowerCase()).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
                             querySnapshot.forEach(function (doc) {
@@ -160,9 +162,6 @@ export const run = async (tokens) => {
 
                     console.log(otokenName, 'totalSoldByDate', totalSoldByDate)
 
-
-
-
                     let boughtEvents = await uniswapExchange.getPastEvents('TokenPurchase', {
                         fromBlock: 0,
                         toBlock: 'latest'
@@ -187,19 +186,22 @@ export const run = async (tokens) => {
 
                             let total = callMultiplier ? ((assetPrice * tokensAmount) / callMultiplier) : (assetPrice * tokensAmount)
 
-                            // update Firebase DB with new transactions
-                            await db.collection('tokensBoughtTest')
-                                .doc(boughtEvents[i].transactionHash)
-                                .set({
-                                    otokenAddress: otokenAddress,
-                                    tokensAmount: tokensAmount,
-                                    date: date,
-                                    block: block,
-                                    transactionHash: transactionHash,
-                                    assetPrice: assetPrice,
-                                    total: total,
-                                    address: address
-                                })
+                            if (assetPrice != 0) {
+                                // update Firebase DB with new transactions
+                                await db.collection('tokensBoughtTransactions')
+                                    .doc(boughtEvents[i].transactionHash)
+                                    .set({
+                                        otokenAddress: otokenAddress.toLowerCase(),
+                                        tokensAmount: tokensAmount,
+                                        date: date,
+                                        block: block,
+                                        transactionHash: transactionHash,
+                                        assetPrice: assetPrice,
+                                        total: total,
+                                        address: address
+                                    })
+                            }
+
 
                         }
 
@@ -207,8 +209,8 @@ export const run = async (tokens) => {
 
 
                     // return all transactions from Firebase DB
-                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBoughtTest');
-                    const filteredBoughtTokensByOtoken = await getUpdatedTokensBoughtFromDb.where("otokenAddress", "==", otokenAddress).get()
+                    const getUpdatedTokensBoughtFromDb = db.collection('tokensBoughtTransactions');
+                    const filteredBoughtTokensByOtoken = await getUpdatedTokensBoughtFromDb.where("otokenAddress", "==", otokenAddress.toLowerCase()).get()
                         .then(function (querySnapshot) {
                             let tokensArray = []
                             querySnapshot.forEach(function (doc) {
