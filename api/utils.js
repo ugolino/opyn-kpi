@@ -125,11 +125,16 @@ exports.getHistoricalPriceCoingecko = async (historicalPrices, address) => {
     let getAddress = formattedAddress === registry.wethAddress.toLowerCase() ? ADDRESS_ZERO : formattedAddress
 
     let token = "ethereum"
-    if (getAddress != ADDRESS_ZERO) {
-        const contractRes = await fetch(
-            `https://api.coingecko.com/api/v3/coins/ethereum/contract/${getAddress}`,
-        )
-        token = ((await contractRes.json())['id'])
+
+    if (getAddress === '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984') {
+        token = 'uniswap'
+    } else {
+        if (getAddress != ADDRESS_ZERO) {
+            const contractRes = await fetch(
+                `https://api.coingecko.com/api/v3/coins/ethereum/contract/${getAddress}`,
+            )
+            token = ((await contractRes.json())['id'])
+        }
     }
 
     const res = await fetch(

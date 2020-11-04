@@ -40,7 +40,7 @@
     </div>
 
 
-    <div class="column is-half">
+    <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">Volumes By Option</p>
@@ -60,13 +60,28 @@
                     {{ props['row']['name'] }}
                 </b-table-column>
                 <b-table-column field="totalSold" label="totalSold" numeric>
-                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalSold'].toFixed(0))  }} </b>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalSold'].toFixed(0)) }}$ </b>
+                </b-table-column>
+                <b-table-column field="totalSold" label="Sold Transactions" numeric>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalSoldTransactions']) }} 
+                    ({{ new Intl.NumberFormat('en-EN').format( (props['row']['totalSold'] / props['row']['totalSoldTransactions']).toFixed(0)) }}$)
+                  </b>
                 </b-table-column>
                 <b-table-column field="totalBought" label="totalBought" numeric>
-                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalBought'].toFixed(0))  }} </b>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalBought'].toFixed(0)) }}$</b>
                 </b-table-column>
-                <b-table-column field="total" label="total" numeric>
-                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['total'].toFixed(0))  }} </b>
+                <b-table-column field="totalSold" label="Bought Transactions" numeric>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalBoughtTransactions']) }}
+                    ({{ new Intl.NumberFormat('en-EN').format( (props['row']['totalBought'] / props['row']['totalBoughtTransactions']).toFixed(0)) }}$)
+                  </b>
+                </b-table-column>
+                <b-table-column field="total" label="Total" numeric>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['total'].toFixed(0)) }}$</b>
+                </b-table-column>
+                <b-table-column field="total" label="Total Transactions" numeric>
+                  <b>{{ new Intl.NumberFormat('en-EN').format(props['row']['totalSoldTransactions'] + props['row']['totalBoughtTransactions']) }}
+                    ({{ new Intl.NumberFormat('en-EN').format( ( props['row']['total'] / (props['row']['totalSoldTransactions'] + props['row']['totalBoughtTransactions'])).toFixed(0)) }}$)
+                  </b>
                 </b-table-column>
                 <b-table-column >
                   <b-button type="is-primary" @click="showOptionOnChart(props['row']['name'])"> > </b-button>
@@ -82,7 +97,7 @@
       </div>
     </div>
 
-    <div class="column is-half">
+    <div class="column is-full">
       <div class="card has-text-centered">
         <header class="card-header">
           <p class="card-header-title">
@@ -123,16 +138,69 @@
           <div class="columns">
             <div class="column">
               <div class="buttons my-4">
-                <b-button @click="SelectedTimeframeForChartDataForUser = 'total'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'weekly'}" type="is-primary">
+                <b-button @click="SelectedTimeframeForChartDataForUser = 'weekly'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'weekly'}" type="is-primary">
                   Weekly
                 </b-button>
-                <b-button @click="SelectedTimeframeForChartDataForUser = 'totalSold'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'monthly'}" type="is-primary">
+                <b-button @click="SelectedTimeframeForChartDataForUser = 'monthly'" :class="{'is-outlined' : SelectedTimeframeForChartDataForUser != 'monthly'}" type="is-primary">
                   Monthly
                 </b-button>
               </div>
             </div>
           </div>
           <column-chart :stacked="true" :data="chartDataForUser" thousands="," :colors="['#1abc9c', '#94849B']" :round="0" ></column-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-full">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Transactions</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              Sold
+              <h3 class="title">
+                {{ totalTransactions.totalSoldTransactions.length }}
+              </h3>
+            </div>
+            <div class="column">
+              Bought
+              <h3 class="title">
+                {{ totalTransactions.totalBoughtTransactions.length }}
+              </h3>
+            </div>
+            <div class="column">
+              total
+              <h3 class="title">
+                {{ totalTransactions.totalSoldTransactions.length + totalTransactions.totalBoughtTransactions.length }}
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="column is-full">
+      <div class="card has-text-centered">
+        <header class="card-header">
+          <p class="card-header-title">Total Transactions</p>
+        </header>
+        <div class="card-content">
+          <div class="columns">
+            <div class="column">
+              <div class="buttons my-4">
+                <b-button @click="SelectedTimeframeForChartDataForTransactions = 'weekly'" :class="{'is-outlined' : SelectedTimeframeForChartDataForTransactions != 'weekly'}" type="is-primary">
+                  Weekly
+                </b-button>
+                <b-button @click="SelectedTimeframeForChartDataForTransactions = 'monthly'" :class="{'is-outlined' : SelectedTimeframeForChartDataForTransactions != 'monthly'}" type="is-primary">
+                  Monthly
+                </b-button>
+              </div>
+            </div>
+          </div>
+          <column-chart :stacked="true" :data="chartDataForTransactions" thousands="," :colors="['#1abc9c', '#94849B']" :round="0" ></column-chart>
         </div>
       </div>
     </div>
@@ -244,6 +312,7 @@ export default {
       selectedTypeForChart: 'totalSold',
       selectedTimeFrameForVolumeChart: 'daily',
       SelectedTimeframeForChartDataForUser: 'weekly',
+      SelectedTimeframeForChartDataForTransactions: 'weekly',
       oracleEthBalance: Number
     }
   },
@@ -263,7 +332,7 @@ export default {
     chartDataByType(){
       return this.chartDataByTimeframe.map( item =>  Object.values({ date: item.date, value: item.values[this.selectedChartDataType] }))
     },
-    totalVolumesByDay(){
+    getTotVolumes(){
       const totalVolumes = []
       this.volumesByDay.map ( option => 
         option.totalBoughtByDate.map ( item =>
@@ -274,22 +343,47 @@ export default {
           totalVolumes.push({date: item.date, total: item.total})
         )
       )
-      let arrayTotVolumesByDay = this.groupAndSum(totalVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
-      let startDate = arrayTotVolumesByDay[0] ? this.$moment.utc(arrayTotVolumesByDay[0].date).format('MM/DD/YY') : this.$moment.utc('2020-02-01').format('MM/DD/YY')
+      console.log('totalVolumes', totalVolumes)
+      return totalVolumes
+    },
+
+    totalVolumesByDay(){
+
+      let totVolumesByDayArray = this.groupAndSum(this.getTotVolumes).sort((a, b) => new Date(a.date) - new Date(b.date))
+
+      let startDate = totVolumesByDayArray[0] ? this.$moment.utc(totVolumesByDayArray[0].date).format('MM/DD/YY') : this.$moment.utc('2020-02-01').format('MM/DD/YY')
       let endDate = this.$moment.utc().format('MM/DD/YY')
      
       let dateArray = this.getDates(startDate, endDate)
 
-      let arrayTotVolumesByDayInclude0 = []
+      let TotVolumesByDayInclude0Array = []
 
       dateArray.map ( date => {
-        let value = arrayTotVolumesByDay.filter( item => item.date === date ).length > 0 ? arrayTotVolumesByDay.filter( item => item.date === date )[0].total : 0
-        arrayTotVolumesByDayInclude0.push({ date: date, value: value })
+        let value = totVolumesByDayArray.filter( item => item.date === date ).length > 0 ? totVolumesByDayArray.filter( item => item.date === date )[0].total : 0
+        TotVolumesByDayInclude0Array.push({ date: date, value: value })
       })
 
-      return arrayTotVolumesByDayInclude0
+      return TotVolumesByDayInclude0Array
 
 
+    },
+
+    totalTransactions(){
+      const totalBoughtTransactions = []
+      const totalSoldTransactions = []
+      this.volumesByDay.map ( option => {
+        option.rawTotalBought.map ( item =>
+          totalBoughtTransactions.push(item)
+        )
+        && 
+        option.rawTotalSold.map ( item =>
+          totalSoldTransactions.push(item)
+        )
+      })
+      
+      console.log('this.volumesByDay', this.volumesByDay)
+
+      return {totalBoughtTransactions: totalBoughtTransactions, totalSoldTransactions: totalSoldTransactions}
     },
 
     totVolumesByWeek(){
@@ -324,7 +418,9 @@ export default {
             id: option.id,
             name: option.name, 
             totalBought: totalBought,
+            totalBoughtTransactions: option.rawTotalBought.length,
             totalSold: totalSold,
+            totalSoldTransactions: option.rawTotalSold.length,
             total: totalSold + totalBought
           })
         }
@@ -397,6 +493,7 @@ export default {
 
     totSoldUsers(){
       let allTransactions = []
+      console.log('this.volumesByDay', this.volumesByDay)
       if (this.volumesByDay) {
         this.volumesByDay.map( item => {
           item.rawTotalSold.map ( transaction =>{
@@ -421,6 +518,41 @@ export default {
       return allTransactions
     },
 
+    chartDataForTransactions(){
+      let totSold = []
+      let totBought = []
+
+
+      if (this.SelectedTimeframeForChartDataForTransactions === "weekly") {
+        totSold = this.usersByWeek(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: item.users.length }) 
+        )
+        totBought = this.usersByWeek(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: item.users.length }) 
+        )
+      } else {
+        totSold = this.usersByMonth(this.totSoldUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: item.users.length }) 
+        )
+        totBought = this.usersByMonth(this.totBoughtUsers.sort((a, b) => new Date(a.date) - new Date(b.date))).map ( 
+          item => Object.values({ date: item.date, value: item.users.length }) 
+        )       
+      }
+
+      return [
+        { 
+          name: 'sold',
+          data: totSold
+        },
+        { 
+          name: 'bought',
+          data: totBought
+        }
+
+      ]
+
+    },
+
     chartDataForUser(){
 
       let totSold = []
@@ -441,8 +573,6 @@ export default {
           item => Object.values({ date: item.date, value: new Set(item.users).size }) 
         )       
       }
-
-
 
 
       return [
