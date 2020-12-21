@@ -12,8 +12,8 @@
     "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
     "epic-spinners": "^1.1.0",
-    "lodash": "^4.17.20",
     "firebase": "7.19.1",
+    "lodash": "^4.17.20",
     "moment-timezone": "^0.5.31",
     "node-fetch": "^2.6.0",
     "node-sass": "^4.14.1",
@@ -27,7 +27,7 @@
     "vue-numeral-filter": "^2.0.0",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0",
-    "vuex-persistedstate": "^3.0.1"
+    "vuex-persistedstate": "^4.0.0-beta.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.4.0",
