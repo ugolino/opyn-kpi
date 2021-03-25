@@ -474,6 +474,9 @@ export default {
       let value = this.totalVolumesByDay[this.totalVolumesByDay.length - 2] ? this.totalVolumesByDay[this.totalVolumesByDay.length - 2].value : null
       return { label: "Yesterday", value: value }
     },
+    last30daysVolume(){
+      return this.totalVolumesByDay.slice(Math.max(this.totalVolumesByDay.length - 31, 1))
+    },
     currentWeekVolume(){
       let value = this.totVolumesByWeek[this.totVolumesByWeek.length - 1] ? this.totVolumesByWeek[this.totVolumesByWeek.length - 1].value : null
       return { label: "Current Week", value: value }
