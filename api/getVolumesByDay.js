@@ -21,7 +21,7 @@ export const run = async (tokens) => {
     const getData = async () => {
 
         return Promise.all(
-            tokens.slice().map(async(token, i) => {
+            tokens.slice(Math.max(tokens.length - 10, 1)).map(async(token, i) => {
 
                 
                 let otokenAddress = await token._address.toLowerCase(); // oToken address
